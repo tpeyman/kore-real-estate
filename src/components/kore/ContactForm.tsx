@@ -13,11 +13,11 @@ const ContactForm = ({ onSubmit, onBack }: ContactFormProps) => {
     phone: '',
     email: '',
     nationality: '',
-    preferredLanguage: '',
+    preferredLanguage: ''
   });
 
   const update = (field: keyof ContactInfo, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const isValid = form.fullName && form.phone && form.email;
@@ -35,8 +35,8 @@ const ContactForm = ({ onSubmit, onBack }: ContactFormProps) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
-      className="w-full max-w-lg mx-auto px-4"
-    >
+      className="w-full max-w-lg mx-auto px-4">
+
       <h2 className="text-2xl md:text-3xl font-serif text-foreground mb-2 text-center">
         Almost There
       </h2>
@@ -45,11 +45,11 @@ const ContactForm = ({ onSubmit, onBack }: ContactFormProps) => {
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" placeholder="Full Name *" value={form.fullName} onChange={e => update('fullName', e.target.value)} className={inputClass} required />
-        <input type="tel" placeholder="Phone Number *" value={form.phone} onChange={e => update('phone', e.target.value)} className={inputClass} required />
-        <input type="email" placeholder="Email Address *" value={form.email} onChange={e => update('email', e.target.value)} className={inputClass} required />
-        <input type="text" placeholder="Nationality" value={form.nationality} onChange={e => update('nationality', e.target.value)} className={inputClass} />
-        <select value={form.preferredLanguage} onChange={e => update('preferredLanguage', e.target.value)} className={inputClass}>
+        <input type="text" placeholder="Full Name *" value={form.fullName} onChange={(e) => update('fullName', e.target.value)} className={inputClass} required />
+        <input type="tel" placeholder="Phone Number *" value={form.phone} onChange={(e) => update('phone', e.target.value)} className={inputClass} required />
+        <input type="email" placeholder="Email Address *" value={form.email} onChange={(e) => update('email', e.target.value)} className={inputClass} required />
+        
+        <select value={form.preferredLanguage} onChange={(e) => update('preferredLanguage', e.target.value)} className={inputClass}>
           <option value="">Preferred Language</option>
           <option value="English">English</option>
           <option value="Arabic">Arabic</option>
@@ -67,8 +67,8 @@ const ContactForm = ({ onSubmit, onBack }: ContactFormProps) => {
           whileTap={{ scale: 0.98 }}
           disabled={!isValid}
           className="w-full py-4 rounded-xl font-sans font-semibold text-base
-            bg-primary text-primary-foreground disabled:opacity-40 transition-all duration-300 mt-2"
-        >
+            bg-primary text-primary-foreground disabled:opacity-40 transition-all duration-300 mt-2">
+
           Review Summary
         </motion.button>
       </form>
@@ -78,8 +78,8 @@ const ContactForm = ({ onSubmit, onBack }: ContactFormProps) => {
           ← Go Back
         </button>
       </div>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default ContactForm;
