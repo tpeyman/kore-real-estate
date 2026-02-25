@@ -124,7 +124,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_mortgage_status', text: 'What is your mortgage status?', type: 'select', options: [{ label: 'Pre-approved', value: 'Pre-approved' }, { label: 'Need Assistance', value: 'Need Assistance' }], condition: a => a.buyer_status === 'Ready' && a.buyer_payment === 'Mortgage' },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
     { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('buyer_property_type') },
-    { id: 'buyer_budget', text: 'What is your budget range?', type: 'select', options: BUYER_BUDGET },
+    { id: 'buyer_budget', text: 'What is your budget range?', type: 'text', subtitle: 'Enter your budget in AED (e.g. 2,000,000)' },
     { id: 'buyer_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'buyer_timeline', text: 'What is your timeline?', type: 'select', options: TIMELINE },
     { id: 'buyer_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
@@ -258,7 +258,8 @@ export function calculateLeadScore(leadType: LeadType, answers: Record<string, s
 
   switch (leadType) {
     case 'buyer': {
-      const highBudget = ['2M-5M', '5M-10M', '10M+'].includes(answers.buyer_budget);
+      const budgetNum = parseFloat(answers.buyer_budget?.replace(/[^0-9.]/g, '') || '0');
+      const highBudget = budgetNum >= 2000000;
       const immediate = answers.buyer_timeline === 'Immediate';
       const cashOrApproved = answers.buyer_payment === 'Cash' || answers.buyer_mortgage_status === 'Pre-approved';
       if (highBudget && immediate) score = 'HOT';
