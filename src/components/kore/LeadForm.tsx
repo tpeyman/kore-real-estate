@@ -75,7 +75,12 @@ const LeadForm = () => {
     setPhase('thank-you');
   }, [leadType, answers, contact, score, luxuryTier, tags]);
 
-  const currentQuestion = leadType && phase === 'questions' ? getCurrentQuestion(FLOWS[leadType], answers) : null;
+  const rawQuestion = leadType && phase === 'questions' ? getCurrentQuestion(FLOWS[leadType], answers) : null;
+  // Resolve dynamic options based on current answers
+  const currentQuestion = rawQuestion ? {
+    ...rawQuestion,
+    options: rawQuestion.dynamicOptions ? rawQuestion.dynamicOptions(answers) : rawQuestion.options,
+  } : null;
   const progress = leadType ? getProgress(FLOWS[leadType], answers) : 0;
 
   // Overall progress including contact + summary phases

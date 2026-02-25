@@ -13,6 +13,7 @@ export interface Question {
   subtitle?: string;
   type: QuestionType;
   options?: QuestionOption[];
+  dynamicOptions?: (answers: Record<string, string>) => QuestionOption[];
   condition?: (answers: Record<string, string>) => boolean;
 }
 
@@ -51,13 +52,34 @@ const PROPERTY_TYPES: QuestionOption[] = [
   { label: 'Townhouse', value: 'Townhouse' },
 ];
 
-const BEDROOMS: QuestionOption[] = [
+const BEDROOMS_APARTMENT: QuestionOption[] = [
   { label: 'Studio', value: 'Studio' },
   { label: '1 Bedroom', value: '1' },
   { label: '2 Bedrooms', value: '2' },
   { label: '3 Bedrooms', value: '3' },
   { label: '4+ Bedrooms', value: '4+' },
 ];
+
+const BEDROOMS_TOWNHOUSE: QuestionOption[] = [
+  { label: '2 Bedrooms', value: '2' },
+  { label: '3 Bedrooms', value: '3' },
+  { label: '4+ Bedrooms', value: '4+' },
+];
+
+const BEDROOMS_VILLA: QuestionOption[] = [
+  { label: '3 Bedrooms', value: '3' },
+  { label: '4 Bedrooms', value: '4' },
+  { label: '5+ Bedrooms', value: '5+' },
+];
+
+function getBedroomsByPropertyType(propertyTypeKey: string) {
+  return (answers: Record<string, string>): QuestionOption[] => {
+    const pt = answers[propertyTypeKey];
+    if (pt === 'Villa' || pt === 'Ultra Villa') return BEDROOMS_VILLA;
+    if (pt === 'Townhouse') return BEDROOMS_TOWNHOUSE;
+    return BEDROOMS_APARTMENT;
+  };
+}
 
 const TIMELINE: QuestionOption[] = [
   { label: 'Immediate', value: 'Immediate' },
@@ -79,6 +101,9 @@ const DUBAI_AREAS: QuestionOption[] = [
   { label: 'Dubai Creek Harbour', value: 'Dubai Creek Harbour' },
   { label: 'MBR City', value: 'MBR City' },
   { label: 'Emaar Beachfront', value: 'Emaar Beachfront' },
+  { label: 'Town Square', value: 'Town Square' },
+  { label: 'Damac Lagoons', value: 'Damac Lagoons' },
+  { label: 'Dubai Production City', value: 'Dubai Production City' },
   { label: 'Other', value: 'Other' },
 ];
 
@@ -98,7 +123,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_payment', text: 'How will you be paying?', type: 'select', options: [{ label: 'Cash', value: 'Cash' }, { label: 'Mortgage', value: 'Mortgage' }], condition: a => a.buyer_status === 'Ready' },
     { id: 'buyer_mortgage_status', text: 'What is your mortgage status?', type: 'select', options: [{ label: 'Pre-approved', value: 'Pre-approved' }, { label: 'Need Assistance', value: 'Need Assistance' }], condition: a => a.buyer_status === 'Ready' && a.buyer_payment === 'Mortgage' },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
-    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', options: BEDROOMS },
+    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('buyer_property_type') },
     { id: 'buyer_budget', text: 'What is your budget range?', type: 'select', options: BUYER_BUDGET },
     { id: 'buyer_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'buyer_timeline', text: 'What is your timeline?', type: 'select', options: TIMELINE },
@@ -122,7 +147,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
 
   tenant: [
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
-    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', options: BEDROOMS },
+    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('tenant_property_type') },
     { id: 'tenant_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'select', options: [
       { label: 'Under 30K AED', value: 'Under 30K' },
@@ -172,7 +197,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
       { label: '10M+ AED', value: '10M+' },
     ]},
     { id: 'offplan_property_type', text: 'What type of property?', type: 'select', options: PROPERTY_TYPES },
-    { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', options: BEDROOMS },
+    { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getBedroomsByPropertyType('offplan_property_type') },
     { id: 'offplan_style', text: 'What is your investment style?', type: 'select', options: [
       { label: 'Low Down Payment', value: 'Low DP' },
       { label: '1% Monthly Plan', value: '1% Plan' },
@@ -204,7 +229,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
       { label: 'Waterfront / Beachfront', value: 'Waterfront' },
       { label: 'Ultra Luxury Villa', value: 'Ultra Villa' },
     ]},
-    { id: 'luxury_bedrooms', text: 'How many bedrooms?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: BEDROOMS },
+    { id: 'luxury_bedrooms', text: 'How many bedrooms?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: getBedroomsByPropertyType('luxury_asset_type') },
     { id: 'luxury_dp_ready', text: 'Is your down payment ready?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
     { id: 'luxury_payment_pref', text: 'Preferred payment structure?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [
       { label: 'Full Cash', value: 'Cash' },
