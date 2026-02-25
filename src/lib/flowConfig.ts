@@ -122,10 +122,10 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_status', text: 'Are you looking for off-plan or ready property?', type: 'select', options: [{ label: 'Off-Plan', value: 'Off-Plan' }, { label: 'Ready Property', value: 'Ready' }] },
     { id: 'buyer_payment', text: 'How will you be paying?', type: 'select', options: [{ label: 'Cash', value: 'Cash' }, { label: 'Mortgage', value: 'Mortgage' }], condition: a => a.buyer_status === 'Ready' },
     { id: 'buyer_mortgage_status', text: 'What is your mortgage status?', type: 'select', options: [{ label: 'Pre-approved', value: 'Pre-approved' }, { label: 'Need Assistance', value: 'Need Assistance' }], condition: a => a.buyer_status === 'Ready' && a.buyer_payment === 'Mortgage' },
+    { id: 'buyer_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
     { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('buyer_property_type') },
     { id: 'buyer_budget', text: 'What is your budget range?', type: 'text', subtitle: 'Enter your budget in AED (e.g. 2,000,000)' },
-    { id: 'buyer_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'buyer_timeline', text: 'What is your timeline?', type: 'select', options: TIMELINE },
     { id: 'buyer_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
   ],
@@ -146,9 +146,9 @@ export const FLOWS: Record<LeadType, Question[]> = {
   ],
 
   tenant: [
+    { id: 'tenant_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
     { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('tenant_property_type') },
-    { id: 'tenant_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'text', subtitle: 'Enter your annual budget in AED (e.g. 80,000)' },
     { id: 'tenant_timeline', text: 'When do you need to move in?', type: 'select', options: TIMELINE },
     { id: 'tenant_cheques', text: 'Preferred payment method?', type: 'select', options: [
@@ -189,6 +189,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
       { label: '5M – 10M AED', value: '5M-10M' },
       { label: '10M+ AED', value: '10M+' },
     ]},
+    { id: 'offplan_area', text: 'Preferred area?', type: 'select', options: DUBAI_AREAS },
     { id: 'offplan_property_type', text: 'What type of property?', type: 'select', options: PROPERTY_TYPES },
     { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getBedroomsByPropertyType('offplan_property_type') },
     { id: 'offplan_style', text: 'What is your investment style?', type: 'select', options: [
@@ -199,7 +200,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     ]},
     { id: 'offplan_timeline', text: 'What is your timeline?', type: 'select', options: TIMELINE },
     { id: 'offplan_dp_ready', text: 'Is your down payment ready?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
-    { id: 'offplan_area', text: 'Preferred area?', type: 'select', options: DUBAI_AREAS },
+    { id: 'offplan_residency', text: 'Are you interested in UAE residency?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }, { label: 'Not Sure', value: 'Not Sure' }] },
     { id: 'offplan_residency', text: 'Are you interested in UAE residency?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }, { label: 'Not Sure', value: 'Not Sure' }] },
   ],
 
