@@ -94,14 +94,21 @@ const LeadForm = () => {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="pt-8 pb-4 px-4 text-center">
-        <motion.h1
+        <motion.button
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl md:text-3xl font-serif"
+          onClick={() => {
+            setPhase('type-select');
+            setLeadType(null);
+            setAnswers({});
+            setAnswerOrder([]);
+            setContact(null);
+          }}
+          className="text-2xl md:text-3xl font-serif cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity"
         >
           <span className="text-gradient-gold">KORE</span>
           <span className="text-foreground/60 ml-2 text-lg md:text-xl font-sans font-light">Real Estate</span>
-        </motion.h1>
+        </motion.button>
       </header>
 
       {/* Progress */}
