@@ -149,14 +149,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
     { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('tenant_property_type') },
     { id: 'tenant_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
-    { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'select', options: [
-      { label: 'Under 30K AED', value: 'Under 30K' },
-      { label: '30K – 50K AED', value: '30K-50K' },
-      { label: '50K – 80K AED', value: '50K-80K' },
-      { label: '80K – 120K AED', value: '80K-120K' },
-      { label: '120K – 200K AED', value: '120K-200K' },
-      { label: '200K+ AED', value: '200K+' },
-    ]},
+    { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'text', subtitle: 'Enter your annual budget in AED (e.g. 80,000)' },
     { id: 'tenant_timeline', text: 'When do you need to move in?', type: 'select', options: TIMELINE },
     { id: 'tenant_cheques', text: 'Preferred payment method?', type: 'select', options: [
       { label: '1 Cheque', value: '1 Cheque' },
