@@ -5,11 +5,10 @@ import { FLOWS, LEAD_TYPE_OPTIONS, getCurrentQuestion, getProgress, calculateLea
 import ProgressBar from './ProgressBar';
 import StepRenderer from './StepRenderer';
 import ContactForm from './ContactForm';
-import OtpVerification from './OtpVerification';
 import Summary from './Summary';
 import ThankYou from './ThankYou';
 
-type Phase = 'type-select' | 'questions' | 'contact' | 'otp' | 'summary' | 'thank-you';
+type Phase = 'type-select' | 'questions' | 'contact' | 'summary' | 'thank-you';
 
 const LeadForm = () => {
   const [phase, setPhase] = useState<Phase>('type-select');
@@ -20,8 +19,6 @@ const LeadForm = () => {
   const [score, setScore] = useState<LeadScore>('WARM');
   const [luxuryTier, setLuxuryTier] = useState<LuxuryTier | undefined>();
   const [tags, setTags] = useState<string[]>([]);
-  const [pendingEmail, setPendingEmail] = useState('');
-  const [emailVerified, setEmailVerified] = useState(false);
 
   const handleSelectType = useCallback((type: LeadType) => {
     setLeadType(type);
@@ -63,16 +60,6 @@ const LeadForm = () => {
     setAnswerOrder((prev) => prev.slice(0, -1));
   }, [answers, answerOrder]);
 
-  const handleRequestOtp = useCallback((email: string) => {
-    setPendingEmail(email);
-    setPhase('otp');
-  }, []);
-
-  const handleOtpVerified = useCallback(() => {
-    setEmailVerified(true);
-    setPhase('contact');
-  }, []);
-
   const handleContactSubmit = useCallback((info: ContactInfo) => {
     setContact(info);
     const result = calculateLeadScore(leadType!, answers);
@@ -100,7 +87,6 @@ const LeadForm = () => {
   const overallProgress = phase === 'type-select' ? 0 :
   phase === 'questions' ? 0.1 + progress * 0.6 :
   phase === 'contact' ? 0.75 :
-  phase === 'otp' ? 0.8 :
   phase === 'summary' ? 0.9 :
   1;
 
@@ -190,17 +176,8 @@ const LeadForm = () => {
           <ContactForm
             key="contact"
             onSubmit={handleContactSubmit}
-            onBack={() => setPhase('questions')}
-            onRequestOtp={handleRequestOtp}
-            emailVerified={emailVerified} />
-          }
+            onBack={() => setPhase('questions')} />
 
-          {phase === 'otp' &&
-          <OtpVerification
-            key="otp"
-            email={pendingEmail}
-            onVerified={handleOtpVerified}
-            onBack={() => setPhase('contact')} />
           }
 
           {phase === 'summary' && contact &&
