@@ -67,15 +67,25 @@ const BEDROOMS_TOWNHOUSE: QuestionOption[] = [
 ];
 
 const BEDROOMS_VILLA: QuestionOption[] = [
+  { label: '2 Bedrooms', value: '2' },
   { label: '3 Bedrooms', value: '3' },
   { label: '4 Bedrooms', value: '4' },
   { label: '5+ Bedrooms', value: '5+' },
 ];
 
-function getBedroomsByPropertyType(propertyTypeKey: string) {
+const BEDROOMS_VILLA_PALM: QuestionOption[] = [
+  { label: '3 Bedrooms', value: '3' },
+  { label: '4 Bedrooms', value: '4' },
+  { label: '5+ Bedrooms', value: '5+' },
+];
+
+function getBedroomsByPropertyType(propertyTypeKey: string, areaKey?: string) {
   return (answers: Record<string, string>): QuestionOption[] => {
     const pt = answers[propertyTypeKey];
-    if (pt === 'Villa' || pt === 'Ultra Villa') return BEDROOMS_VILLA;
+    const area = areaKey ? answers[areaKey] : '';
+    if (pt === 'Villa' || pt === 'Ultra Villa') {
+      return area === 'Palm Jumeirah' ? BEDROOMS_VILLA_PALM : BEDROOMS_VILLA;
+    }
     if (pt === 'Townhouse') return BEDROOMS_TOWNHOUSE;
     return BEDROOMS_APARTMENT;
   };
@@ -124,7 +134,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_mortgage_status', text: 'What is your mortgage status?', type: 'select', options: [{ label: 'Pre-approved', value: 'Pre-approved' }, { label: 'Need Assistance', value: 'Need Assistance' }], condition: a => a.buyer_status === 'Ready' && a.buyer_payment === 'Mortgage' },
     { id: 'buyer_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
-    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('buyer_property_type') },
+    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('buyer_property_type', 'buyer_area') },
     { id: 'buyer_budget', text: 'What is your budget range?', type: 'text', subtitle: 'Enter your budget in AED (e.g. 2,000,000)' },
     { id: 'buyer_timeline', text: 'What is your timeline?', type: 'select', options: TIMELINE },
     { id: 'buyer_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
@@ -148,7 +158,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
   tenant: [
     { id: 'tenant_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
-    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('tenant_property_type') },
+    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('tenant_property_type', 'tenant_area') },
     { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'text', subtitle: 'Enter your annual budget in AED (e.g. 80,000)' },
     { id: 'tenant_timeline', text: 'When do you need to move in?', type: 'select', options: TIMELINE },
     { id: 'tenant_cheques', text: 'Preferred payment method?', type: 'select', options: [
@@ -191,7 +201,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     ]},
     { id: 'offplan_area', text: 'Preferred area?', type: 'select', options: DUBAI_AREAS },
     { id: 'offplan_property_type', text: 'What type of property?', type: 'select', options: PROPERTY_TYPES },
-    { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getBedroomsByPropertyType('offplan_property_type') },
+    { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getBedroomsByPropertyType('offplan_property_type', 'offplan_area') },
     { id: 'offplan_style', text: 'What is your investment style?', type: 'select', options: [
       { label: 'Low Down Payment', value: 'Low DP' },
       { label: '1% Monthly Plan', value: '1% Plan' },
