@@ -7,7 +7,7 @@ type VerifyMethod = 'email' | 'phone' | null;
 interface ContactFormProps {
   onSubmit: (info: ContactInfo) => void;
   onBack: () => void;
-  onRequestOtp: (value: string, method: VerifyMethod) => void;
+  onRequestOtp: (value: string, method: VerifyMethod, contactInfo: ContactInfo) => void;
   emailVerified?: boolean;
 }
 
@@ -19,30 +19,35 @@ const ContactForm = ({ onSubmit, onBack, onRequestOtp, emailVerified: externalVe
     nationality: '',
     preferredLanguage: ''
   });
-  const [verifyMethod, setVerifyMethod] = useState<VerifyMethod>(null);
-  const verified = externalVerified;
+  const [showMethodPicker, setShowMethodPicker] = useState(false);
 
   const update = (field: keyof ContactInfo, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const isValid = form.fullName && form.phone && form.email && verified;
+  const hasRequired = !!(form.fullName && form.phone && form.email);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleReviewClick = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isValid) onSubmit(form);
-  };
+    if (!hasRequired) return;
 
-  const handleVerify = (method: VerifyMethod) => {
-    const value = method === 'email' ? form.email : form.phone;
-    if (value) {
-      setVerifyMethod(method);
-      onRequestOtp(value, method);
+    if (externalVerified) {
+      onSubmit(form);
+    } else {
+      setShowMethodPicker(true);
     }
   };
 
-  const canVerifyEmail = form.email && !verified;
-  const canVerifyPhone = form.phone && !verified;
+  const handleMethodSelect = (method: 'email' | 'phone') => {
+    const value = method === 'email' ? form.email : form.phone;
+    setShowMethodPicker(false);
+    onRequestOtp(value, method, form);
+  };
+
+  // If returned from OTP verified, submit directly
+  if (externalVerified && hasRequired) {
+    // Auto-submit on next render when verified
+  }
 
   const inputClass = "w-full px-5 py-3.5 rounded-xl border border-border bg-card text-foreground font-sans text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300";
 
@@ -61,56 +66,10 @@ const ContactForm = ({ onSubmit, onBack, onRequestOtp, emailVerified: externalVe
         Share your details so our team can reach you
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleReviewClick} className="space-y-4">
         <input type="text" placeholder="Full Name *" value={form.fullName} onChange={(e) => update('fullName', e.target.value)} className={inputClass} required />
-        
-        <div className="relative">
-          <input type="tel" placeholder="Phone Number *" value={form.phone} onChange={(e) => update('phone', e.target.value)} className={inputClass} required />
-          {canVerifyPhone && verifyMethod !== 'phone' && (
-            <motion.button
-              type="button"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              onClick={() => handleVerify('phone')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-sans font-semibold hover:bg-primary/90 transition-colors"
-            >
-              Verify
-            </motion.button>
-          )}
-          {verified && verifyMethod === 'phone' && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-sans font-semibold text-primary flex items-center gap-1"
-            >
-              ✓ Verified
-            </motion.span>
-          )}
-        </div>
-
-        <div className="relative">
-          <input type="email" placeholder="Email Address *" value={form.email} onChange={(e) => update('email', e.target.value)} className={inputClass} required />
-          {canVerifyEmail && verifyMethod !== 'email' && (
-            <motion.button
-              type="button"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              onClick={() => handleVerify('email')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-sans font-semibold hover:bg-primary/90 transition-colors"
-            >
-              Verify
-            </motion.button>
-          )}
-          {verified && verifyMethod === 'email' && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-sans font-semibold text-primary flex items-center gap-1"
-            >
-              ✓ Verified
-            </motion.span>
-          )}
-        </div>
+        <input type="tel" placeholder="Phone Number *" value={form.phone} onChange={(e) => update('phone', e.target.value)} className={inputClass} required />
+        <input type="email" placeholder="Email Address *" value={form.email} onChange={(e) => update('email', e.target.value)} className={inputClass} required />
 
         <select value={form.preferredLanguage} onChange={(e) => update('preferredLanguage', e.target.value)} className={inputClass}>
           <option value="">Preferred Language</option>
@@ -128,18 +87,53 @@ const ContactForm = ({ onSubmit, onBack, onRequestOtp, emailVerified: externalVe
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          disabled={!isValid}
+          disabled={!hasRequired}
           className="w-full py-4 rounded-xl font-sans font-semibold text-base
             bg-primary text-primary-foreground disabled:opacity-40 transition-all duration-300 mt-2">
           Review Summary
         </motion.button>
-
-        {!verified && (form.email || form.phone) && (
-          <p className="text-muted-foreground text-center text-xs font-sans">
-            Please verify your phone number or email to continue
-          </p>
-        )}
       </form>
+
+      {/* Verification method picker overlay */}
+      {showMethodPicker && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMethodPicker(false)} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="relative z-10 w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl"
+          >
+            <h3 className="text-xl font-serif text-foreground text-center mb-2">Verify Your Identity</h3>
+            <p className="text-muted-foreground text-center text-sm font-sans mb-6">
+              Choose how you'd like to verify
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => handleMethodSelect('phone')}
+                className="w-full py-3.5 rounded-xl border border-border bg-secondary text-secondary-foreground font-sans text-sm hover:border-primary/50 hover:bg-secondary/80 transition-all"
+              >
+                Verify via Phone — {form.phone}
+              </button>
+              <button
+                onClick={() => handleMethodSelect('email')}
+                className="w-full py-3.5 rounded-xl border border-border bg-secondary text-secondary-foreground font-sans text-sm hover:border-primary/50 hover:bg-secondary/80 transition-all"
+              >
+                Verify via Email — {form.email}
+              </button>
+            </div>
+            <button
+              onClick={() => setShowMethodPicker(false)}
+              className="mt-4 w-full text-center text-muted-foreground hover:text-foreground font-sans text-xs transition-colors"
+            >
+              Cancel
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
 
       <div className="mt-6 text-center">
         <button onClick={onBack} className="text-muted-foreground hover:text-foreground font-sans text-sm transition-colors">

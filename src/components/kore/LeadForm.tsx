@@ -64,18 +64,32 @@ const LeadForm = () => {
     setAnswerOrder((prev) => prev.slice(0, -1));
   }, [answers, answerOrder]);
 
-  const handleRequestOtp = useCallback((value: string, method: 'email' | 'phone' | null) => {
+  const [pendingContact, setPendingContact] = useState<ContactInfo | null>(null);
+
+  const handleRequestOtp = useCallback((value: string, method: 'email' | 'phone' | null, contactInfo?: ContactInfo) => {
     setPendingValue(value);
     setVerifyMethod(method);
+    if (contactInfo) setPendingContact(contactInfo);
     setPhase('otp');
   }, []);
 
   const handleOtpVerified = useCallback(() => {
     setContactVerified(true);
-    setPhase('contact');
-  }, []);
+    // After verification, go straight to summary with pending contact
+    if (pendingContact) {
+      setContact(pendingContact);
+      const result = calculateLeadScore(leadType!, answers);
+      setScore(result.score);
+      setLuxuryTier(result.luxuryTier);
+      setTags(result.tags);
+      setPhase('summary');
+    } else {
+      setPhase('contact');
+    }
+  }, [pendingContact, leadType, answers]);
 
   const handleContactSubmit = useCallback((info: ContactInfo) => {
+    setPendingContact(info);
     setContact(info);
     const result = calculateLeadScore(leadType!, answers);
     setScore(result.score);
