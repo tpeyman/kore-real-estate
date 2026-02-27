@@ -1,52 +1,19 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 
 interface OtpVerificationProps {
-  email: string;
+  contactValue: string;
+  method: 'email' | 'phone';
   onVerified: () => void;
   onBack: () => void;
 }
 
-const OtpVerification = ({ email, onVerified, onBack }: OtpVerificationProps) => {
+const OtpVerification = ({ contactValue, method, onVerified, onBack }: OtpVerificationProps) => {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  // Send OTP on mount
-  useEffect(() => {
-    sendOtp();
-  }, []);
-
-  // Cooldown timer
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [cooldown]);
-
-  const sendOtp = async () => {
-    setSending(true);
-    setError('');
-    try {
-      const { data, error: fnError } = await supabase.functions.invoke('send-otp', {
-        body: { email },
-      });
-      if (fnError) throw fnError;
-      if (data?.error) throw new Error(data.error);
-      setSent(true);
-      setCooldown(60);
-    } catch (err: any) {
-      setError('Failed to send code. Please try again.');
-      console.error('Send OTP error:', err);
-    } finally {
-      setSending(false);
-    }
-  };
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -55,12 +22,10 @@ const OtpVerification = ({ email, onVerified, onBack }: OtpVerificationProps) =>
     setOtp(newOtp);
     setError('');
 
-    // Auto-focus next
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-verify when all filled
     const fullCode = newOtp.join('');
     if (fullCode.length === 6) {
       verifyOtp(fullCode);
@@ -94,7 +59,7 @@ const OtpVerification = ({ email, onVerified, onBack }: OtpVerificationProps) =>
     setError('');
     try {
       const { data, error: fnError } = await supabase.functions.invoke('verify-otp', {
-        body: { email, code },
+        body: { code },
       });
       if (fnError) throw fnError;
       if (data?.verified) {
@@ -112,6 +77,7 @@ const OtpVerification = ({ email, onVerified, onBack }: OtpVerificationProps) =>
     }
   };
 
+  const label = method === 'email' ? 'email' : 'phone number';
   const inputClass =
     'w-12 h-14 text-center text-xl font-mono rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300';
 
@@ -124,11 +90,13 @@ const OtpVerification = ({ email, onVerified, onBack }: OtpVerificationProps) =>
       className="w-full max-w-lg mx-auto px-4 text-center"
     >
       <h2 className="text-2xl md:text-3xl font-serif text-foreground mb-2">
-        Verify Your Email
+        Verify Your {method === 'email' ? 'Email' : 'Phone'}
       </h2>
-      <p className="text-muted-foreground font-sans text-sm mb-8">
-        We sent a 6-digit code to{' '}
-        <span className="text-foreground font-medium">{email}</span>
+      <p className="text-muted-foreground font-sans text-sm mb-2">
+        Enter any 6-digit code to verify your {label}
+      </p>
+      <p className="text-foreground font-medium font-sans text-sm mb-8">
+        {contactValue}
       </p>
 
       <div className="flex justify-center gap-2 mb-6" onPaste={handlePaste}>
@@ -163,27 +131,13 @@ const OtpVerification = ({ email, onVerified, onBack }: OtpVerificationProps) =>
         <p className="text-muted-foreground font-sans text-sm mb-4">Verifying...</p>
       )}
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-6">
         <button
-          onClick={sendOtp}
-          disabled={sending || cooldown > 0}
-          className="text-primary hover:text-primary/80 font-sans text-sm transition-colors disabled:opacity-40"
+          onClick={onBack}
+          className="text-muted-foreground hover:text-foreground font-sans text-sm transition-colors"
         >
-          {sending
-            ? 'Sending...'
-            : cooldown > 0
-            ? `Resend code in ${cooldown}s`
-            : 'Resend code'}
+          ← Go back
         </button>
-
-        <div>
-          <button
-            onClick={onBack}
-            className="text-muted-foreground hover:text-foreground font-sans text-sm transition-colors"
-          >
-            ← Change email
-          </button>
-        </div>
       </div>
     </motion.div>
   );

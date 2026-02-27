@@ -20,8 +20,9 @@ const LeadForm = () => {
   const [score, setScore] = useState<LeadScore>('WARM');
   const [luxuryTier, setLuxuryTier] = useState<LuxuryTier | undefined>();
   const [tags, setTags] = useState<string[]>([]);
-  const [pendingEmail, setPendingEmail] = useState('');
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [pendingValue, setPendingValue] = useState('');
+  const [verifyMethod, setVerifyMethod] = useState<'email' | 'phone' | null>(null);
+  const [contactVerified, setContactVerified] = useState(false);
 
   const handleSelectType = useCallback((type: LeadType) => {
     setLeadType(type);
@@ -63,13 +64,14 @@ const LeadForm = () => {
     setAnswerOrder((prev) => prev.slice(0, -1));
   }, [answers, answerOrder]);
 
-  const handleRequestOtp = useCallback((email: string) => {
-    setPendingEmail(email);
+  const handleRequestOtp = useCallback((value: string, method: 'email' | 'phone' | null) => {
+    setPendingValue(value);
+    setVerifyMethod(method);
     setPhase('otp');
   }, []);
 
   const handleOtpVerified = useCallback(() => {
-    setEmailVerified(true);
+    setContactVerified(true);
     setPhase('contact');
   }, []);
 
@@ -192,13 +194,14 @@ const LeadForm = () => {
             onSubmit={handleContactSubmit}
             onBack={() => setPhase('questions')}
             onRequestOtp={handleRequestOtp}
-            emailVerified={emailVerified} />
+            emailVerified={contactVerified} />
           }
 
-          {phase === 'otp' &&
+          {phase === 'otp' && verifyMethod &&
           <OtpVerification
             key="otp"
-            email={pendingEmail}
+            contactValue={pendingValue}
+            method={verifyMethod}
             onVerified={handleOtpVerified}
             onBack={() => setPhase('contact')} />
           }
