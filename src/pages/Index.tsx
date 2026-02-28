@@ -5,6 +5,7 @@ import LeadForm from '@/components/kore/LeadForm';
 
 const Index = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const [formPhase, setFormPhase] = useState<string>('type-select');
 
   return (
     <>
@@ -44,17 +45,18 @@ const Index = () => {
               transition={{ duration: 0.3 }}
               className="relative z-10 w-full max-w-3xl max-h-[90vh] rounded-2xl border border-border bg-background shadow-2xl"
             >
-              {/* Close button - sticky so it stays visible when scrolling */}
-              <button
-                onClick={() => setIsOpen(false)}
-                className="sticky top-3 float-right mr-3 mt-3 z-20 p-1.5 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              {(formPhase === 'type-select' || formPhase === 'thank-you') && (
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="sticky top-3 float-right mr-3 mt-3 z-20 p-1.5 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
 
               <div className="overflow-y-auto max-h-[90vh]">
-                <LeadForm />
+                <LeadForm onPhaseChange={setFormPhase} />
               </div>
             </motion.div>
           </motion.div>
