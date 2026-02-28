@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { LeadType, ContactInfo, LeadScore, LuxuryTier } from '@/lib/flowConfig';
 import { FLOWS, LEAD_TYPE_OPTIONS, getCurrentQuestion, getProgress, calculateLeadScore } from '@/lib/flowConfig';
@@ -11,7 +11,11 @@ import ThankYou from './ThankYou';
 
 type Phase = 'type-select' | 'questions' | 'contact' | 'otp' | 'summary' | 'thank-you';
 
-const LeadForm = () => {
+interface LeadFormProps {
+  onPhaseChange?: (phase: Phase) => void;
+}
+
+const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
   const [phase, setPhase] = useState<Phase>('type-select');
   const [leadType, setLeadType] = useState<LeadType | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -23,6 +27,10 @@ const LeadForm = () => {
   const [pendingValue, setPendingValue] = useState('');
   const [verifyMethod, setVerifyMethod] = useState<'email' | 'phone' | null>(null);
   const [contactVerified, setContactVerified] = useState(false);
+
+  useEffect(() => {
+    onPhaseChange?.(phase);
+  }, [phase, onPhaseChange]);
 
   const handleSelectType = useCallback((type: LeadType) => {
     setLeadType(type);
@@ -179,7 +187,6 @@ const LeadForm = () => {
                 onClick={() => handleSelectType(option.value)}
                 className="group glass-card rounded-2xl p-6 text-left hover:border-primary/50 transition-all duration-300 glow-gold hover:glow-gold">
 
-                    
                     <span className="font-serif text-lg text-foreground group-hover:text-primary transition-colors block mb-1">
                       {option.label}
                     </span>
