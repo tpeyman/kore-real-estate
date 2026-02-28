@@ -45,7 +45,7 @@ const Index = () => {
               transition={{ duration: 0.3 }}
               className="relative z-10 w-full max-w-3xl max-h-[90vh] rounded-2xl border border-border bg-background shadow-2xl"
             >
-              {(formPhase === 'type-select' || formPhase === 'thank-you') && (
+              {(formPhase === 'type-select' || formPhase === 'thank-you' || formPhase === 'job-upload' || formPhase === 'job-summary') && (
                 <button
                   onClick={() => setIsOpen(false)}
                   className="sticky top-3 float-right mr-3 mt-3 z-20 p-1.5 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
