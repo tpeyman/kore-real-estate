@@ -8,12 +8,16 @@ interface JobData {
   location: string;
   experience: string;
   drivingLicence: string;
-  linkedin: string;
+  portfolio: string;
+  fullName: string;
+  phone: string;
+  email: string;
+  preferredLanguage: string;
 }
 
-type JobStep = 'upload' | 'position' | 'education' | 'location' | 'experience' | 'licence' | 'linkedin' | 'summary';
+type JobStep = 'upload' | 'position' | 'education' | 'location' | 'experience' | 'licence' | 'portfolio' | 'contact' | 'summary';
 
-const STEPS: JobStep[] = ['upload', 'position', 'education', 'location', 'experience', 'licence', 'linkedin', 'summary'];
+const STEPS: JobStep[] = ['upload', 'position', 'education', 'location', 'experience', 'licence', 'portfolio', 'contact', 'summary'];
 
 interface JobApplicationFlowProps {
   onBack: () => void;
@@ -30,7 +34,11 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
     location: '',
     experience: '',
     drivingLicence: '',
-    linkedin: '',
+    portfolio: '',
+    fullName: '',
+    phone: '',
+    email: '',
+    preferredLanguage: '',
   });
   const [textValue, setTextValue] = useState('');
 
@@ -68,6 +76,18 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
     setData(prev => ({ ...prev, [field]: textValue.trim() }));
     setTextValue('');
     goTo(nextStep);
+  };
+
+  const updateContact = (field: keyof JobData, value: string) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const hasRequiredContact = !!(data.fullName && data.phone && data.email);
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hasRequiredContact) return;
+    goTo('summary');
   };
 
   const selectBtnClass = "group relative px-6 py-4 rounded-xl border border-border bg-card text-card-foreground font-sans text-base hover:border-primary hover:bg-secondary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 text-left";
@@ -211,7 +231,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
-                  onClick={() => handleSelect('drivingLicence', val, 'linkedin')}
+                  onClick={() => handleSelect('drivingLicence', val, 'portfolio')}
                   className={selectBtnClass}
                 >
                   <span className="group-hover:text-primary transition-colors">{val}</span>
@@ -221,29 +241,100 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
           </StepWrapper>
         );
 
-      case 'linkedin':
+      case 'portfolio':
         return (
-          <StepWrapper key="linkedin" title="LinkedIn Profile" subtitle="Optional — share your LinkedIn URL">
+          <StepWrapper key="portfolio" title="Portfolio or Social Media" subtitle="Optional — Share a link to your portfolio or relevant professional social media account.">
             <div className="space-y-4">
               <input
                 type="text"
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit('linkedin', 'summary', true)}
-                placeholder="https://linkedin.com/in/yourprofile"
+                onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit('portfolio', 'contact', true)}
+                placeholder="https://yourportfolio.com"
                 autoFocus
                 className={inputClass}
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => handleTextSubmit('linkedin', 'summary', true)}
+                onClick={() => handleTextSubmit('portfolio', 'contact', true)}
                 className={continueBtnClass}
               >
                 {textValue.trim() ? 'Continue' : 'Skip'}
               </motion.button>
             </div>
           </StepWrapper>
+        );
+
+      case 'contact':
+        return (
+          <motion.div
+            key="contact"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="w-full max-w-lg mx-auto px-4"
+          >
+            <h2 className="text-2xl md:text-3xl font-serif text-foreground mb-2 text-center">
+              Almost There
+            </h2>
+            <p className="text-muted-foreground text-center mb-8 font-sans text-sm">
+              Share your details so our team can reach you
+            </p>
+
+            <form onSubmit={handleContactSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Full Name *"
+                value={data.fullName}
+                onChange={(e) => updateContact('fullName', e.target.value)}
+                className={inputClass}
+                required
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number *"
+                value={data.phone}
+                onChange={(e) => updateContact('phone', e.target.value)}
+                className={inputClass}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email Address *"
+                value={data.email}
+                onChange={(e) => updateContact('email', e.target.value)}
+                className={inputClass}
+                required
+              />
+              <select
+                value={data.preferredLanguage}
+                onChange={(e) => updateContact('preferredLanguage', e.target.value)}
+                className={inputClass}
+              >
+                <option value="">Preferred Language</option>
+                <option value="English">English</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Russian">Russian</option>
+                <option value="Chinese">Chinese</option>
+                <option value="French">French</option>
+                <option value="Other">Other</option>
+              </select>
+
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                disabled={!hasRequiredContact}
+                className={continueBtnClass + ' mt-2'}
+              >
+                Review Summary
+              </motion.button>
+            </form>
+          </motion.div>
         );
 
       case 'summary':
@@ -257,7 +348,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
             className="w-full max-w-lg mx-auto px-4"
           >
             <h2 className="text-2xl md:text-3xl font-serif text-foreground mb-2 text-center">
-              Almost There
+              Review Summary
             </h2>
             <p className="text-muted-foreground text-center mb-6 font-sans text-sm">
               Please review your application details
@@ -279,7 +370,22 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                 <SummaryRow label="Location" value={data.location} />
                 <SummaryRow label="RE Experience" value={data.experience} />
                 <SummaryRow label="Driving Licence" value={data.drivingLicence} />
-                {data.linkedin && <SummaryRow label="LinkedIn" value={data.linkedin} />}
+                {data.portfolio && <SummaryRow label="Portfolio" value={data.portfolio} />}
+              </div>
+
+              <div className="h-px bg-border" />
+
+              <div>
+                <span className="text-primary font-sans font-semibold text-sm uppercase tracking-wider">
+                  Contact Details
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <SummaryRow label="Full Name" value={data.fullName} />
+                <SummaryRow label="Phone" value={data.phone} />
+                <SummaryRow label="Email" value={data.email} />
+                {data.preferredLanguage && <SummaryRow label="Language" value={data.preferredLanguage} />}
               </div>
             </div>
 
@@ -304,7 +410,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
 
   return (
     <>
-      {step !== 'summary' && (
+      {step !== 'summary' && step !== 'contact' && (
         <div className="px-4 max-w-2xl mx-auto w-full py-4">
           <div className="h-1 bg-muted rounded-full overflow-hidden">
             <motion.div
@@ -323,7 +429,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
         </AnimatePresence>
       </div>
 
-      {step !== 'summary' && (
+      {step !== 'summary' && step !== 'contact' && (
         <div className="pb-6 text-center">
           <button onClick={handleBack} className="text-muted-foreground hover:text-foreground font-sans text-sm transition-colors">
             ← Go Back
