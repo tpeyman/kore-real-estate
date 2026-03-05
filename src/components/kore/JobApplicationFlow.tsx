@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import OtpVerification from './OtpVerification';
+import PhoneInputField from './PhoneInputField';
 import { supabase } from '@/integrations/supabase/client';
 
 interface JobData {
@@ -103,7 +104,9 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
     setData(prev => ({ ...prev, [field]: value }));
   };
 
-  const hasRequiredContact = !!(data.fullName && data.phone && data.email);
+  const [phoneValid, setPhoneValid] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const hasRequiredContact = !!(data.fullName && data.phone && data.email && phoneValid);
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -337,14 +340,21 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                 className={inputClass}
                 required
               />
-              <input
-                type="tel"
-                placeholder="Phone Number *"
-                value={data.phone}
-                onChange={(e) => updateContact('phone', e.target.value)}
-                className={inputClass}
-                required
-              />
+              <div>
+                <PhoneInputField
+                  value={data.phone}
+                  onChange={(phone, isValid) => {
+                    updateContact('phone', phone);
+                    setPhoneValid(isValid);
+                    setPhoneError(phone && !isValid ? 'Please enter a valid phone number' : '');
+                  }}
+                  className={inputClass}
+                  defaultCountry="ae"
+                />
+                {phoneError && (
+                  <p className="text-destructive font-sans text-xs mt-1.5 ml-1">{phoneError}</p>
+                )}
+              </div>
               <input
                 type="email"
                 placeholder="Email Address *"
