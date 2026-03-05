@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import OtpVerification from './OtpVerification';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JobData {
   cvFileName: string;
@@ -15,9 +17,9 @@ interface JobData {
   preferredLanguage: string;
 }
 
-type JobStep = 'upload' | 'position' | 'education' | 'location' | 'experience' | 'licence' | 'portfolio' | 'contact' | 'summary';
+type JobStep = 'upload' | 'position' | 'education' | 'location' | 'experience' | 'licence' | 'portfolio' | 'contact' | 'verify-pick' | 'otp' | 'summary';
 
-const STEPS: JobStep[] = ['upload', 'position', 'education', 'location', 'experience', 'licence', 'portfolio', 'contact', 'summary'];
+const STEPS: JobStep[] = ['upload', 'position', 'education', 'location', 'experience', 'licence', 'portfolio', 'contact', 'verify-pick', 'otp', 'summary'];
 
 interface JobApplicationFlowProps {
   onBack: () => void;
@@ -41,6 +43,8 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
     preferredLanguage: '',
   });
   const [textValue, setTextValue] = useState('');
+  const [verifyMethod, setVerifyMethod] = useState<'email' | 'phone' | null>(null);
+  const [pendingValue, setPendingValue] = useState('');
 
   const goTo = useCallback((s: JobStep) => {
     setStep(s);
@@ -48,14 +52,31 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
   }, [onStepChange]);
 
   const currentIndex = STEPS.indexOf(step);
-  const progress = currentIndex / (STEPS.length - 1);
+  // Progress based on the main steps (exclude verify-pick and otp from visual progress)
+  const mainSteps = ['upload', 'position', 'education', 'location', 'experience', 'licence', 'portfolio', 'contact', 'summary'];
+  const mainIndex = mainSteps.indexOf(step === 'verify-pick' || step === 'otp' ? 'contact' : step);
+  const progress = mainIndex / (mainSteps.length - 1);
 
   const handleBack = () => {
+    if (step === 'otp') {
+      goTo('verify-pick');
+      return;
+    }
+    if (step === 'verify-pick') {
+      goTo('contact');
+      return;
+    }
     if (currentIndex === 0) {
       onBack();
       return;
     }
-    goTo(STEPS[currentIndex - 1]);
+    // Find previous step in STEPS, skipping verify-pick and otp
+    let prev = currentIndex - 1;
+    while (prev >= 0 && (STEPS[prev] === 'verify-pick' || STEPS[prev] === 'otp')) {
+      prev--;
+    }
+    if (prev >= 0) goTo(STEPS[prev]);
+    else onBack();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,12 +108,36 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!hasRequiredContact) return;
+    goTo('verify-pick');
+  };
+
+  const handleMethodSelect = async (method: 'email' | 'phone') => {
+    const value = method === 'email' ? data.email : data.phone;
+    setVerifyMethod(method);
+    setPendingValue(value);
+
+    // Send OTP
+    try {
+      await supabase.functions.invoke('send-otp', {
+        body: { email: data.email },
+      });
+    } catch (err) {
+      console.error('Failed to send OTP:', err);
+    }
+
+    goTo('otp');
+  };
+
+  const handleOtpVerified = () => {
     goTo('summary');
   };
 
   const selectBtnClass = "group relative px-6 py-4 rounded-xl border border-border bg-card text-card-foreground font-sans text-base hover:border-primary hover:bg-secondary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 text-left";
   const inputClass = "w-full px-6 py-4 rounded-xl border border-border bg-card text-foreground font-sans text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300";
   const continueBtnClass = "w-full py-4 rounded-xl font-sans font-semibold text-base bg-primary text-primary-foreground disabled:opacity-40 transition-all duration-300";
+
+  const showProgressBar = !['summary', 'contact', 'verify-pick', 'otp'].includes(step);
+  const showBackButton = !['summary', 'contact', 'verify-pick', 'otp'].includes(step);
 
   const renderStep = () => {
     switch (step) {
@@ -334,7 +379,67 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                 Review Summary
               </motion.button>
             </form>
+
+            <div className="mt-6 text-center">
+              <button onClick={handleBack} className="text-muted-foreground hover:text-foreground font-sans text-sm transition-colors">
+                ← Go Back
+              </button>
+            </div>
           </motion.div>
+        );
+
+      case 'verify-pick':
+        return (
+          <motion.div
+            key="verify-pick"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => goTo('contact')} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="relative z-10 w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl"
+            >
+              <h3 className="text-xl font-serif text-foreground text-center mb-2">Verify Your Identity</h3>
+              <p className="text-muted-foreground text-center text-sm font-sans mb-6">
+                Choose how you'd like to verify
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => handleMethodSelect('phone')}
+                  className="w-full py-3.5 rounded-xl border border-border bg-secondary text-secondary-foreground font-sans text-sm hover:border-primary/50 hover:bg-secondary/80 transition-all"
+                >
+                  Verify via Phone — {data.phone}
+                </button>
+                <button
+                  onClick={() => handleMethodSelect('email')}
+                  className="w-full py-3.5 rounded-xl border border-border bg-secondary text-secondary-foreground font-sans text-sm hover:border-primary/50 hover:bg-secondary/80 transition-all"
+                >
+                  Verify via Email — {data.email}
+                </button>
+              </div>
+              <button
+                onClick={() => goTo('contact')}
+                className="mt-4 w-full text-center text-muted-foreground hover:text-foreground font-sans text-xs transition-colors"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </motion.div>
+        );
+
+      case 'otp':
+        return (
+          <OtpVerification
+            key="otp"
+            contactValue={pendingValue}
+            method={verifyMethod!}
+            onVerified={handleOtpVerified}
+            onBack={() => goTo('verify-pick')}
+          />
         );
 
       case 'summary':
@@ -410,7 +515,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
 
   return (
     <>
-      {step !== 'summary' && step !== 'contact' && (
+      {showProgressBar && (
         <div className="px-4 max-w-2xl mx-auto w-full py-4">
           <div className="h-1 bg-muted rounded-full overflow-hidden">
             <motion.div
@@ -429,7 +534,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
         </AnimatePresence>
       </div>
 
-      {step !== 'summary' && step !== 'contact' && (
+      {showBackButton && (
         <div className="pb-6 text-center">
           <button onClick={handleBack} className="text-muted-foreground hover:text-foreground font-sans text-sm transition-colors">
             ← Go Back
