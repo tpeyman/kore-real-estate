@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import PhoneInputField from './PhoneInputField';
 import type { ContactInfo } from '@/lib/flowConfig';
 
 type VerifyMethod = 'email' | 'phone' | null;
@@ -20,12 +21,14 @@ const ContactForm = ({ onSubmit, onBack, onRequestOtp, emailVerified: externalVe
     preferredLanguage: ''
   });
   const [showMethodPicker, setShowMethodPicker] = useState(false);
+  const [phoneValid, setPhoneValid] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
 
   const update = (field: keyof ContactInfo, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const hasRequired = !!(form.fullName && form.phone && form.email);
+  const hasRequired = !!(form.fullName && form.phone && form.email && phoneValid);
 
   const handleReviewClick = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +71,21 @@ const ContactForm = ({ onSubmit, onBack, onRequestOtp, emailVerified: externalVe
 
       <form onSubmit={handleReviewClick} className="space-y-4">
         <input type="text" placeholder="Full Name *" value={form.fullName} onChange={(e) => update('fullName', e.target.value)} className={inputClass} required />
-        <input type="tel" placeholder="Phone Number *" value={form.phone} onChange={(e) => update('phone', e.target.value)} className={inputClass} required />
+        <div>
+          <PhoneInputField
+            value={form.phone}
+            onChange={(phone, isValid) => {
+              update('phone', phone);
+              setPhoneValid(isValid);
+              setPhoneError(phone && !isValid ? 'Please enter a valid phone number' : '');
+            }}
+            className={inputClass}
+            defaultCountry="ae"
+          />
+          {phoneError && (
+            <p className="text-destructive font-sans text-xs mt-1.5 ml-1">{phoneError}</p>
+          )}
+        </div>
         <input type="email" placeholder="Email Address *" value={form.email} onChange={(e) => update('email', e.target.value)} className={inputClass} required />
 
         <select value={form.preferredLanguage} onChange={(e) => update('preferredLanguage', e.target.value)} className={inputClass}>
