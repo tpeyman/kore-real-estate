@@ -1,6 +1,6 @@
 export type LeadType = 'buyer' | 'seller' | 'tenant' | 'landlord' | 'offplan' | 'luxury';
 
-export type QuestionType = 'select' | 'text';
+export type QuestionType = 'select' | 'text' | 'autocomplete';
 
 export interface QuestionOption {
   label: string;
@@ -133,7 +133,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_status', text: 'Are you looking for off-plan or ready property?', type: 'select', options: [{ label: 'Off-Plan', value: 'Off-Plan' }, { label: 'Ready Property', value: 'Ready' }] },
     { id: 'buyer_payment', text: 'How will you be paying?', type: 'select', options: [{ label: 'Cash', value: 'Cash' }, { label: 'Mortgage', value: 'Mortgage' }], condition: a => a.buyer_status === 'Ready' },
     { id: 'buyer_mortgage_status', text: 'What is your mortgage status?', type: 'select', options: [{ label: 'Pre-approved', value: 'Pre-approved' }, { label: 'Need Assistance', value: 'Need Assistance' }], condition: a => a.buyer_status === 'Ready' && a.buyer_payment === 'Mortgage' },
-    { id: 'buyer_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
+    { id: 'buyer_area', text: 'Which area do you prefer?', type: 'autocomplete', options: DUBAI_AREAS },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
     { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('buyer_property_type', 'buyer_area') },
     { id: 'buyer_budget', text: 'What is your budget range?', type: 'text', subtitle: 'Enter your budget in AED (e.g. 2,000,000)' },
@@ -157,7 +157,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
   ],
 
   tenant: [
-    { id: 'tenant_area', text: 'Which area do you prefer?', type: 'select', options: DUBAI_AREAS },
+    { id: 'tenant_area', text: 'Which area do you prefer?', type: 'autocomplete', options: DUBAI_AREAS },
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', options: PROPERTY_TYPES },
     { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getBedroomsByPropertyType('tenant_property_type', 'tenant_area') },
     { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'text', subtitle: 'Enter your annual budget in AED (e.g. 80,000)' },
@@ -200,7 +200,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
       { label: '5M – 10M AED', value: '5M-10M' },
       { label: '10M+ AED', value: '10M+' },
     ]},
-    { id: 'offplan_area', text: 'Preferred area?', type: 'select', options: DUBAI_AREAS },
+    { id: 'offplan_area', text: 'Preferred area?', type: 'autocomplete', options: DUBAI_AREAS },
     { id: 'offplan_property_type', text: 'What type of property?', type: 'select', options: PROPERTY_TYPES },
     { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getBedroomsByPropertyType('offplan_property_type', 'offplan_area') },
     { id: 'offplan_style', text: 'What is your investment style?', type: 'select', options: [

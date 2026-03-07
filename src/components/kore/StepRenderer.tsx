@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Question } from '@/lib/flowConfig';
 
@@ -11,11 +11,63 @@ interface StepRendererProps {
 
 const StepRenderer = ({ question, onAnswer, onBack, canGoBack }: StepRendererProps) => {
   const [textValue, setTextValue] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const filteredOptions = useMemo(() => {
+    if (question.type !== 'autocomplete' || !question.options) return [];
+    if (!textValue.trim()) return question.options;
+    const lower = textValue.toLowerCase();
+    return question.options.filter(o => o.label.toLowerCase().includes(lower));
+  }, [question.type, question.options, textValue]);
+
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [filteredOptions]);
+
+  // Scroll highlighted item into view
+  useEffect(() => {
+    if (!listRef.current) return;
+    const items = listRef.current.querySelectorAll('[data-option]');
+    items[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
+  }, [highlightedIndex]);
 
   const handleTextSubmit = () => {
     if (textValue.trim()) {
       onAnswer(question.id, textValue.trim());
       setTextValue('');
+    }
+  };
+
+  const handleAutocompleteSelect = (value: string) => {
+    setTextValue('');
+    setIsOpen(false);
+    onAnswer(question.id, value);
+  };
+
+  const handleAutocompleteKeyDown = (e: React.KeyboardEvent) => {
+    if (!isOpen || filteredOptions.length === 0) {
+      if (e.key === 'ArrowDown') setIsOpen(true);
+      return;
+    }
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(i => Math.min(i + 1, filteredOptions.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(i => Math.max(i - 1, 0));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        handleAutocompleteSelect(filteredOptions[highlightedIndex].value);
+        break;
+      case 'Escape':
+        setIsOpen(false);
+        break;
     }
   };
 
@@ -55,6 +107,53 @@ const StepRenderer = ({ question, onAnswer, onBack, canGoBack }: StepRendererPro
                 <span className="group-hover:text-primary transition-colors">{option.label}</span>
               </motion.button>
             ))}
+          </div>
+        )}
+
+        {question.type === 'autocomplete' && question.options && (
+          <div className="relative space-y-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={textValue}
+              onChange={(e) => {
+                setTextValue(e.target.value);
+                setIsOpen(true);
+              }}
+              onFocus={() => setIsOpen(true)}
+              onBlur={() => setTimeout(() => setIsOpen(false), 150)}
+              onKeyDown={handleAutocompleteKeyDown}
+              placeholder="Start typing a location..."
+              autoFocus
+              className="w-full px-6 py-4 rounded-xl border border-border bg-card text-foreground font-sans text-base
+                placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
+                transition-all duration-300"
+            />
+            {isOpen && filteredOptions.length > 0 && (
+              <div
+                ref={listRef}
+                className="absolute z-50 w-full max-h-64 overflow-y-auto rounded-xl border border-border bg-card shadow-lg"
+              >
+                {filteredOptions.map((option, i) => (
+                  <button
+                    key={option.value}
+                    data-option
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleAutocompleteSelect(option.value)}
+                    onMouseEnter={() => setHighlightedIndex(i)}
+                    className={`w-full px-6 py-3 text-left font-sans text-sm transition-colors
+                      ${i === highlightedIndex ? 'bg-secondary text-primary' : 'text-foreground hover:bg-secondary/50'}`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {isOpen && textValue.trim() && filteredOptions.length === 0 && (
+              <div className="absolute z-50 w-full rounded-xl border border-border bg-card shadow-lg px-6 py-4 text-center">
+                <p className="text-muted-foreground font-sans text-sm">No matching locations found</p>
+              </div>
+            )}
           </div>
         )}
 
