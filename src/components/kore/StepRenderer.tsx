@@ -152,7 +152,12 @@ const StepRenderer = ({ question, answers = {}, onAnswer, onBack, canGoBack }: S
                     className={`w-full px-6 py-3 text-left font-sans text-sm transition-colors
                       ${i === highlightedIndex ? 'bg-secondary text-primary' : 'text-foreground hover:bg-secondary/50'}`}
                   >
-                    {option.label}
+                    <span>{option.label}</span>
+                    {option.matchingProducts && option.matchingProducts.length > 0 && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ({option.matchingProducts.join(', ')})
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
