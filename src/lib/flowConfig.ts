@@ -109,7 +109,7 @@ function getBudgetFilteredLocations(budgetKey: string) {
     if (budget > 0) {
       const filtered = getLocationsByBudget(budget);
       return filtered.map(loc => ({
-        label: loc.name ?? loc.label,
+        label: loc.label,
         value: loc.value,
         matchingProducts: loc.matchingProducts,
       }));
