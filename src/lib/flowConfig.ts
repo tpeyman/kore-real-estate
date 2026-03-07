@@ -1,6 +1,6 @@
 export type LeadType = 'buyer' | 'seller' | 'tenant' | 'landlord' | 'offplan' | 'luxury';
 
-export type QuestionType = 'select' | 'text';
+export type QuestionType = 'select' | 'text' | 'autocomplete';
 
 export interface QuestionOption {
   label: string;
