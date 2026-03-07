@@ -4,24 +4,32 @@ import type { Question } from '@/lib/flowConfig';
 
 interface StepRendererProps {
   question: Question;
+  answers?: Record<string, string>;
   onAnswer: (questionId: string, value: string) => void;
   onBack?: () => void;
   canGoBack: boolean;
 }
 
-const StepRenderer = ({ question, onAnswer, onBack, canGoBack }: StepRendererProps) => {
+const StepRenderer = ({ question, answers = {}, onAnswer, onBack, canGoBack }: StepRendererProps) => {
   const [textValue, setTextValue] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
+  // Resolve options: dynamicOptions (with answers) take priority over static options
+  const resolvedOptions = useMemo(() => {
+    if (question.type !== 'autocomplete') return [];
+    if (question.dynamicOptions) return question.dynamicOptions(answers);
+    return question.options || [];
+  }, [question, answers]);
+
   const filteredOptions = useMemo(() => {
-    if (question.type !== 'autocomplete' || !question.options) return [];
-    if (!textValue.trim()) return question.options;
+    if (question.type !== 'autocomplete') return [];
+    if (!textValue.trim()) return resolvedOptions;
     const lower = textValue.toLowerCase();
-    return question.options.filter(o => o.label.toLowerCase().includes(lower));
-  }, [question.type, question.options, textValue]);
+    return resolvedOptions.filter(o => o.label.toLowerCase().includes(lower));
+  }, [question.type, resolvedOptions, textValue]);
 
   useEffect(() => {
     setHighlightedIndex(0);
@@ -110,7 +118,7 @@ const StepRenderer = ({ question, onAnswer, onBack, canGoBack }: StepRendererPro
           </div>
         )}
 
-        {question.type === 'autocomplete' && question.options && (
+        {question.type === 'autocomplete' && (question.options || question.dynamicOptions) && (
           <div className="relative space-y-2">
             <input
               ref={inputRef}
@@ -144,7 +152,12 @@ const StepRenderer = ({ question, onAnswer, onBack, canGoBack }: StepRendererPro
                     className={`w-full px-6 py-3 text-left font-sans text-sm transition-colors
                       ${i === highlightedIndex ? 'bg-secondary text-primary' : 'text-foreground hover:bg-secondary/50'}`}
                   >
-                    {option.label}
+                    <span>{option.label}</span>
+                    {option.matchingProducts && option.matchingProducts.length > 0 && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ({option.matchingProducts.join(', ')})
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
