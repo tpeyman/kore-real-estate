@@ -322,14 +322,37 @@ export const LOCATIONS: LocationData[] = [
 ];
 
 /**
- * Parse a budget string like "2,000,000" or "2M" or "500K" into a number.
+ * Parse a budget string into a number. Handles:
+ * - Plain numbers: "2000000", "2,000,000"
+ * - Shorthand: "2M", "500K", "1.5m"
+ * - Range values from select: "500K-1M", "2M-5M", "10M+"
  */
 export function parseBudget(input: string): number {
   if (!input) return 0;
+
+  // Handle range values like "500K-1M", "2M-5M", "10M+"
+  const rangeMatch = input.match(/^([\d.]+)([KkMmBb]?)[\s]*[-–][\s]*([\d.]+)([KkMmBb]?)$/);
+  if (rangeMatch) {
+    const low = parseShorthand(rangeMatch[1], rangeMatch[2]);
+    const high = parseShorthand(rangeMatch[3], rangeMatch[4]);
+    return (low + high) / 2; // Use midpoint of range
+  }
+
+  // Handle "10M+" style
+  const plusMatch = input.match(/^([\d.]+)([KkMmBb]?)\+$/);
+  if (plusMatch) {
+    return parseShorthand(plusMatch[1], plusMatch[2]);
+  }
+
+  // Handle "Below 3M" style
+  const belowMatch = input.match(/below\s*([\d.]+)([KkMmBb]?)/i);
+  if (belowMatch) {
+    return parseShorthand(belowMatch[1], belowMatch[2]);
+  }
+
   const cleaned = input.replace(/[^0-9.kmb]/gi, '');
   const lower = cleaned.toLowerCase();
 
-  // Handle shorthand: 2.5m, 500k, 1b
   const mMatch = lower.match(/^([\d.]+)m$/);
   if (mMatch) return parseFloat(mMatch[1]) * 1_000_000;
 
@@ -339,9 +362,18 @@ export function parseBudget(input: string): number {
   const bMatch = lower.match(/^([\d.]+)b$/);
   if (bMatch) return parseFloat(bMatch[1]) * 1_000_000_000;
 
-  // Plain number
   const num = parseFloat(input.replace(/[^0-9.]/g, ''));
   return isNaN(num) ? 0 : num;
+}
+
+function parseShorthand(num: string, suffix: string): number {
+  const n = parseFloat(num);
+  switch (suffix.toUpperCase()) {
+    case 'K': return n * 1_000;
+    case 'M': return n * 1_000_000;
+    case 'B': return n * 1_000_000_000;
+    default: return n;
+  }
 }
 
 /**
