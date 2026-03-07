@@ -218,6 +218,7 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
               <StepRenderer
                 key={currentQuestion.id}
                 question={currentQuestion}
+                answers={answers}
                 onAnswer={handleAnswer}
                 onBack={handleBack}
                 canGoBack />
