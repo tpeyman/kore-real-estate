@@ -118,7 +118,7 @@ const StepRenderer = ({ question, answers = {}, onAnswer, onBack, canGoBack }: S
           </div>
         )}
 
-        {question.type === 'autocomplete' && question.options && (
+        {question.type === 'autocomplete' && (question.options || question.dynamicOptions) && (
           <div className="relative space-y-2">
             <input
               ref={inputRef}
