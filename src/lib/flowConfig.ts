@@ -144,13 +144,8 @@ export const FLOWS: Record<LeadType, Question[]> = {
 
   tenant: [
     { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'budget', subtitle: 'Enter your annual budget in AED', required: true },
-    { id: 'tenant_area', text: 'Which area do you prefer?', type: 'autocomplete', options: DUBAI_AREAS },
-    { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, options: [
-      { label: 'Apartment', value: 'Apartment' },
-      { label: 'Villa', value: 'Villa' },
-      { label: 'Townhouse', value: 'Townhouse' },
-      { label: 'Other', value: 'Other' },
-    ]},
+    { id: 'tenant_area', text: 'Which area do you prefer?', type: 'autocomplete', dynamicOptions: () => getAllLocationOptions() },
+    { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'tenant_area') },
     { id: 'tenant_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.tenant_property_type === 'Other' },
     { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('tenant_property_type', '', 'tenant_area') },
     { id: 'tenant_timeline', text: 'When do you need to move in?', type: 'select', options: TIMELINE },
