@@ -140,7 +140,24 @@ export const FLOWS: Record<LeadType, Question[]> = {
 
   tenant: [
     { id: 'tenant_budget', text: 'What is your annual rental budget?', type: 'budget', subtitle: 'Enter your annual budget in AED', required: true },
-    { id: 'tenant_area', text: 'Which area do you prefer?', type: 'autocomplete', dynamicOptions: () => getAllLocationOptions() },
+    { id: 'tenant_area', text: 'Which area do you prefer?', subtitle: 'Locations filtered based on your rental budget', type: 'autocomplete', dynamicOptions: (answers) => {
+      const budgetStr = answers.tenant_budget || '';
+      const budget = parseBudget(budgetStr);
+      if (budget > 0) {
+        const filtered = getLocationsByRentBudget(budget);
+        return filtered.map(loc => ({
+          label: loc.label,
+          value: loc.value,
+          matchingProducts: [`From AED ${formatNumberWithCommas(loc.startingRent)}/yr`, ...loc.matchingProducts],
+        }));
+      }
+      const allRental = getLocationsByRentBudget(0);
+      return allRental.map(loc => ({
+        label: loc.label,
+        value: loc.value,
+        matchingProducts: [`From AED ${formatNumberWithCommas(loc.startingRent)}/yr`, ...loc.matchingProducts],
+      }));
+    }},
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'tenant_area') },
     { id: 'tenant_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.tenant_property_type === 'Other' },
     { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('tenant_property_type') },
