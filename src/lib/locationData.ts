@@ -654,6 +654,57 @@ export function getBedroomsByTypeAndBudget(
 }
 
 /**
+ * Get bedroom options filtered by property type, annual rent budget, and area.
+ */
+export function getBedroomsByTypeAndRentBudget(
+  propertyType: string,
+  rentBudget: number,
+  area?: string
+): { label: string; value: string }[] {
+  const bedroomSet = new Set<string>();
+
+  const datasetTypes: string[] = [];
+  for (const [dataKey, displayVal] of Object.entries(PRODUCT_TYPE_MAP)) {
+    if (displayVal.toLowerCase() === propertyType.toLowerCase()) {
+      datasetTypes.push(dataKey.toLowerCase());
+    }
+  }
+
+  const locationsToCheck = area
+    ? LOCATIONS.filter(loc => loc.value === area)
+    : LOCATIONS;
+
+  for (const loc of locationsToCheck) {
+    for (const p of loc.products) {
+      if (p.minRent == null) continue;
+      if (datasetTypes.includes(p.type.toLowerCase())) {
+        if (rentBudget <= 0 || rentBudget >= p.minRent) {
+          const brs = parseUnitTypes(p.unitTypes);
+          brs.forEach(br => bedroomSet.add(br));
+        }
+      }
+    }
+  }
+
+  const sorted = Array.from(bedroomSet).sort((a, b) => {
+    if (a === 'Studio') return -1;
+    if (b === 'Studio') return 1;
+    const aNum = parseInt(a);
+    const bNum = parseInt(b);
+    if (isNaN(aNum)) return 1;
+    if (isNaN(bNum)) return -1;
+    return aNum - bNum;
+  });
+
+  return sorted.map(br => {
+    if (br === 'Studio') return { label: 'Studio', value: 'Studio' };
+    if (br.includes('+')) return { label: `${br} Bedrooms`, value: br };
+    const n = parseInt(br);
+    return { label: `${br} Bedroom${n > 1 ? 's' : ''}`, value: br };
+  });
+}
+
+/**
  * Format a number with commas (e.g., 1500000 → "1,500,000")
  */
 export function formatNumberWithCommas(value: string | number): string {
