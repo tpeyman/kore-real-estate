@@ -69,7 +69,8 @@ const StepRenderer = ({ question, answers = {}, onAnswer, onBack, canGoBack }: S
       return;
     }
     
-    const validation = validateBudget(budget);
+    const isRentalBudget = question.id.includes('tenant') || question.id.includes('landlord_rent');
+    const validation = isRentalBudget ? validateRentBudget(budget) : validateBudget(budget);
     
     if (!validation.valid) {
       setValidationMessage(validation.message || 'Invalid budget');
