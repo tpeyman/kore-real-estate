@@ -62,12 +62,10 @@ import {
   getLocationsByBudget, 
   parseBudget, 
   getPropertyTypesByBudgetAndArea,
-  getBedroomsByTypeAndBudget 
 } from './locationData';
 import { PROPERTY_TYPES_WITH_OTHER } from '@/constants/propertyTypes';
-import { BEDROOM_OPTIONS_MUTABLE } from '@/constants/bedroomOptions';
+import { getBedroomsForPropertyType, ALL_BEDROOMS } from '@/constants/bedroomOptions';
 
-const FALLBACK_BEDROOMS: QuestionOption[] = BEDROOM_OPTIONS_MUTABLE;
 const FALLBACK_PROPERTY_TYPES: QuestionOption[] = PROPERTY_TYPES_WITH_OTHER.map(o => ({ ...o }));
 
 function getBudgetFilteredLocations(budgetKey: string) {
@@ -96,10 +94,11 @@ function getDynamicPropertyTypes(budgetKey: string, areaKey: string) {
   };
 }
 
-function getDynamicBedrooms(_propertyTypeKey: string, _budgetKey: string, _areaKey: string) {
-  return (_answers: Record<string, string>): QuestionOption[] => {
-    // Always return the full static bedroom list
-    return FALLBACK_BEDROOMS;
+function getDynamicBedrooms(propertyTypeKey: string) {
+  return (answers: Record<string, string>): QuestionOption[] => {
+    const propertyType = answers[propertyTypeKey] || '';
+    if (!propertyType || propertyType === 'Other') return ALL_BEDROOMS;
+    return getBedroomsForPropertyType(propertyType);
   };
 }
 
@@ -115,7 +114,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_area', text: 'Which area do you prefer?', subtitle: 'Locations filtered based on your budget', type: 'autocomplete', dynamicOptions: getBudgetFilteredLocations('buyer_budget') },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('buyer_budget', 'buyer_area') },
     { id: 'buyer_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.buyer_property_type === 'Other' },
-    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('buyer_property_type', 'buyer_budget', 'buyer_area') },
+    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('buyer_property_type') },
     { id: 'buyer_timeline', text: 'What is your timeline?', type: 'select', options: TIMELINE },
     { id: 'buyer_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
   ],
@@ -124,7 +123,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'seller_community', text: 'Which community is your property in?', type: 'autocomplete', subtitle: 'Select from our communities', dynamicOptions: () => getAllLocationOptions() },
     { id: 'seller_property_type', text: 'What type of property are you selling?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'seller_community') },
     { id: 'seller_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.seller_property_type === 'Other' },
-    { id: 'seller_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('seller_property_type', '', 'seller_community') },
+    { id: 'seller_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('seller_property_type') },
     { id: 'seller_status', text: 'Is your property ready or off-plan?', type: 'select', options: [{ label: 'Ready', value: 'Ready' }, { label: 'Off-Plan', value: 'Off-Plan' }] },
     { id: 'seller_payment_status', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Mortgage', value: 'Mortgage' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.seller_status === 'Ready' },
     { id: 'seller_offplan_payment', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.seller_status === 'Off-Plan' },
@@ -142,7 +141,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'tenant_area', text: 'Which area do you prefer?', type: 'autocomplete', dynamicOptions: () => getAllLocationOptions() },
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'tenant_area') },
     { id: 'tenant_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.tenant_property_type === 'Other' },
-    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('tenant_property_type', '', 'tenant_area') },
+    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('tenant_property_type') },
     { id: 'tenant_timeline', text: 'When do you need to move in?', type: 'select', options: TIMELINE },
     { id: 'tenant_cheques', text: 'Preferred payment method?', type: 'select', options: [
       { label: '1 Cheque', value: '1 Cheque' },
@@ -158,7 +157,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'landlord_community', text: 'Which community is your property in?', type: 'autocomplete', subtitle: 'Select from our communities', dynamicOptions: () => getAllLocationOptions() },
     { id: 'landlord_property_type', text: 'What type of property are you listing?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'landlord_community') },
     { id: 'landlord_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.landlord_property_type === 'Other' },
-    { id: 'landlord_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('landlord_property_type', '', 'landlord_community') },
+    { id: 'landlord_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('landlord_property_type') },
     { id: 'landlord_status', text: 'Is your property ready or off-plan?', type: 'select', options: [{ label: 'Ready', value: 'Ready' }, { label: 'Off-Plan', value: 'Off-Plan' }] },
     { id: 'landlord_offplan_payment', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.landlord_status === 'Off-Plan' },
     { id: 'landlord_occupancy', text: 'Is the property vacant or tenanted?', type: 'select', options: [{ label: 'Vacant', value: 'Vacant' }, { label: 'Tenanted', value: 'Tenanted' }] },
@@ -181,7 +180,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'offplan_area', text: 'Preferred area?', subtitle: 'Locations filtered based on your budget', type: 'autocomplete', dynamicOptions: getBudgetFilteredLocations('offplan_budget') },
     { id: 'offplan_property_type', text: 'What type of property?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('offplan_budget', 'offplan_area') },
     { id: 'offplan_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.offplan_property_type === 'Other' },
-    { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('offplan_property_type', 'offplan_budget', 'offplan_area') },
+    { id: 'offplan_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('offplan_property_type') },
     { id: 'offplan_style', text: 'What is your investment style?', type: 'select', options: [
       { label: 'Low Down Payment', value: 'Low DP' },
       { label: '1% Monthly Plan', value: '1% Plan' },
@@ -195,8 +194,8 @@ export const FLOWS: Record<LeadType, Question[]> = {
 
   luxury: [
     { id: 'luxury_budget', text: 'What is your investment range?', type: 'select', subtitle: 'Luxury investments start at 3M AED', options: [
-      { label: '3M – 5M AED', value: '3M-5M' },
-      { label: '5M – 10M AED', value: '5M-10M' },
+      { label: '3M \u2013 5M AED', value: '3M-5M' },
+      { label: '5M \u2013 10M AED', value: '5M-10M' },
       { label: '10M+ AED', value: '10M+' },
       { label: 'Below 3M AED', value: 'Below 3M' },
     ]},
@@ -219,7 +218,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     }},
     { id: 'luxury_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: getDynamicPropertyTypes('luxury_budget', 'luxury_location') },
     { id: 'luxury_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.luxury_budget !== 'Below 3M' && a.luxury_property_type === 'Other' },
-    { id: 'luxury_bedrooms', text: 'How many bedrooms?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: getDynamicBedrooms('luxury_property_type', 'luxury_budget', 'luxury_location') },
+    { id: 'luxury_bedrooms', text: 'How many bedrooms?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: getDynamicBedrooms('luxury_property_type') },
     { id: 'luxury_dp_ready', text: 'Is your down payment ready?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
     { id: 'luxury_payment_pref', text: 'Preferred payment structure?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [
       { label: 'Full Cash', value: 'Cash' },
