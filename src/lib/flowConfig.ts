@@ -64,6 +64,11 @@ import {
   getPropertyTypesByBudgetAndArea,
   getBedroomsByTypeAndBudget 
 } from './locationData';
+import { PROPERTY_TYPES_WITH_OTHER } from '@/constants/propertyTypes';
+import { BEDROOM_OPTIONS_MUTABLE } from '@/constants/bedroomOptions';
+
+const FALLBACK_BEDROOMS: QuestionOption[] = BEDROOM_OPTIONS_MUTABLE;
+const FALLBACK_PROPERTY_TYPES: QuestionOption[] = PROPERTY_TYPES_WITH_OTHER.map(o => ({ ...o }));
 
 function getBudgetFilteredLocations(budgetKey: string) {
   return (answers: Record<string, string>): QuestionOption[] => {
@@ -86,33 +91,20 @@ function getDynamicPropertyTypes(budgetKey: string, areaKey: string) {
     const budgetStr = answers[budgetKey] || '';
     const budget = parseBudget(budgetStr);
     const area = answers[areaKey] || '';
-    return getPropertyTypesByBudgetAndArea(budget, area);
+    const types = getPropertyTypesByBudgetAndArea(budget, area);
+    return types.length > 1 ? types : FALLBACK_PROPERTY_TYPES;
   };
 }
 
 function getDynamicBedrooms(propertyTypeKey: string, budgetKey: string, areaKey: string) {
   return (answers: Record<string, string>): QuestionOption[] => {
     const propertyType = answers[propertyTypeKey] || '';
-    if (propertyType === 'Other') {
-      return [
-        { label: 'Studio', value: 'Studio' },
-        { label: '1 Bedroom', value: '1' },
-        { label: '2 Bedrooms', value: '2' },
-        { label: '3 Bedrooms', value: '3' },
-        { label: '4+ Bedrooms', value: '4+' },
-      ];
-    }
+    if (propertyType === 'Other') return FALLBACK_BEDROOMS;
     const budgetStr = answers[budgetKey] || '';
     const budget = parseBudget(budgetStr);
     const area = answers[areaKey] || '';
     const bedrooms = getBedroomsByTypeAndBudget(propertyType, budget, area);
-    return bedrooms.length > 0 ? bedrooms : [
-      { label: 'Studio', value: 'Studio' },
-      { label: '1 Bedroom', value: '1' },
-      { label: '2 Bedrooms', value: '2' },
-      { label: '3 Bedrooms', value: '3' },
-      { label: '4+ Bedrooms', value: '4+' },
-    ];
+    return bedrooms.length > 0 ? bedrooms : FALLBACK_BEDROOMS;
   };
 }
 
