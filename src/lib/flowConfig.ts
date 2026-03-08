@@ -60,8 +60,10 @@ const TIMELINE: QuestionOption[] = [
 import { 
   getAllLocationOptions, 
   getLocationsByBudget, 
+  getLocationsByRentBudget,
   parseBudget, 
   getPropertyTypesByBudgetAndArea,
+  formatNumberWithCommas,
 } from './locationData';
 import { PROPERTY_TYPES_WITH_OTHER } from '@/constants/propertyTypes';
 import { getBedroomsForPropertyType, ALL_BEDROOMS } from '@/constants/bedroomOptions';
