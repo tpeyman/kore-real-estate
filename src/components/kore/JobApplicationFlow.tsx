@@ -225,13 +225,18 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
         );
 
       case 'location':
+        // Text-only validation - no numbers allowed
+        const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const value = e.target.value.replace(/[^a-zA-Z\s,.\-']/g, '');
+          setTextValue(value);
+        };
         return (
           <StepWrapper key="location" title="Location of Residence" subtitle="Where are you currently based?">
             <div className="space-y-4">
               <input
                 type="text"
                 value={textValue}
-                onChange={(e) => setTextValue(e.target.value)}
+                onChange={handleLocationChange}
                 onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit('location', 'experience')}
                 placeholder="e.g. Dubai, UAE"
                 autoFocus
