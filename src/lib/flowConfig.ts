@@ -126,19 +126,14 @@ export const FLOWS: Record<LeadType, Question[]> = {
   ],
 
   seller: [
-    { id: 'seller_property_type', text: 'What type of property are you selling?', type: 'select', hasOther: true, options: [
-      { label: 'Apartment', value: 'Apartment' },
-      { label: 'Villa', value: 'Villa' },
-      { label: 'Townhouse', value: 'Townhouse' },
-      { label: 'Penthouse', value: 'Penthouse' },
-      { label: 'Other', value: 'Other' },
-    ]},
+    { id: 'seller_community', text: 'Which community is your property in?', type: 'autocomplete', subtitle: 'Select from our communities', dynamicOptions: () => getAllLocationOptions() },
+    { id: 'seller_property_type', text: 'What type of property are you selling?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'seller_community') },
     { id: 'seller_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.seller_property_type === 'Other' },
+    { id: 'seller_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('seller_property_type', '', 'seller_community') },
     { id: 'seller_status', text: 'Is your property ready or off-plan?', type: 'select', options: [{ label: 'Ready', value: 'Ready' }, { label: 'Off-Plan', value: 'Off-Plan' }] },
     { id: 'seller_payment_status', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Mortgage', value: 'Mortgage' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.seller_status === 'Ready' },
     { id: 'seller_offplan_payment', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.seller_status === 'Off-Plan' },
     { id: 'seller_outstanding', text: 'What is the outstanding amount?', type: 'budget', subtitle: 'Enter amount in AED', condition: a => a.seller_payment_status === 'Mortgage' || a.seller_payment_status === 'Payment Plan' || a.seller_offplan_payment === 'Payment Plan' },
-    { id: 'seller_community', text: 'Which community is your property in?', type: 'autocomplete', subtitle: 'Select from our communities or type your own', options: DUBAI_AREAS },
     { id: 'seller_occupancy', text: 'Is the property vacant or tenanted?', type: 'select', options: [{ label: 'Vacant', value: 'Vacant' }, { label: 'Tenanted', value: 'Tenanted' }] },
     { id: 'seller_contract_expiry', text: 'When does the tenancy contract expire?', type: 'calendar', subtitle: 'Select the contract expiry date', condition: a => a.seller_occupancy === 'Tenanted' },
     { id: 'seller_legal_notice', text: 'Has a legal notice been served to the tenant?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }], condition: a => a.seller_occupancy === 'Tenanted' },
