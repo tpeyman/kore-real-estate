@@ -382,11 +382,10 @@ function parseShorthand(num: string, suffix: string): number {
  */
 export function getLocationsByBudget(budget: number): { label: string; value: string; matchingProducts: string[] }[] {
   if (budget <= 0) {
-    // No budget filter — return all locations
     return LOCATIONS.map(loc => ({
       label: loc.name,
       value: loc.value,
-      matchingProducts: loc.products.map(p => p.type),
+      matchingProducts: loc.products.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
     }));
   }
 
@@ -397,7 +396,7 @@ export function getLocationsByBudget(budget: number): { label: string; value: st
       return {
         label: loc.name,
         value: loc.value,
-        matchingProducts: matching.map(p => p.type),
+        matchingProducts: matching.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
       };
     })
     .filter(Boolean) as { label: string; value: string; matchingProducts: string[] }[];
@@ -436,8 +435,21 @@ export function getMaxBudgetAcrossLocations(): number {
   return max;
 }
 
+// Map dataset product types to the 4 standard display types
+const PRODUCT_TYPE_MAP: Record<string, string> = {
+  'Apartments': 'Apartment',
+  'Villas': 'Villa',
+  'Townhouses': 'Townhouse',
+  'Penthouses': 'Penthouse',
+  'Mansions': 'Villa', // Mansions mapped to Villa
+};
+
+// Canonical order for property types
+const PROPERTY_TYPE_ORDER = ['Apartment', 'Villa', 'Townhouse', 'Penthouse'];
+
 /**
- * Get available property types based on budget and optionally area
+ * Get available property types based on budget and optionally area.
+ * Returns exactly from: Apartment, Villa, Townhouse, Penthouse + Other
  */
 export function getPropertyTypesByBudgetAndArea(
   budget: number,
@@ -452,22 +464,27 @@ export function getPropertyTypesByBudgetAndArea(
   for (const loc of locationsToCheck) {
     for (const p of loc.products) {
       if (budget <= 0 || (budget >= p.minBudget && budget <= p.maxBudget)) {
-        // Normalize type names for display
-        const displayType = p.type.replace(/s$/, ''); // Remove trailing 's'
+        const displayType = PRODUCT_TYPE_MAP[p.type] || p.type;
         types.add(displayType);
       }
     }
   }
 
-  const result = Array.from(types).map(t => ({ label: t, value: t }));
+  // Sort by canonical order
+  const result = PROPERTY_TYPE_ORDER
+    .filter(t => types.has(t))
+    .map(t => ({ label: t, value: t }));
+
   // Add "Other" option
   result.push({ label: 'Other', value: 'Other' });
   return result;
 }
 
 /**
- * Parse unit types string to get bedroom options
- * e.g. "Studio → 4BR" returns ['Studio', '1', '2', '3', '4']
+ * Parse unit types string to get bedroom options.
+ * "Studio → 4BR" → ['Studio', '1', '2', '3', '4']
+ * "3BR → 6BR+" → ['3', '4', '5', '6+']
+ * "4BR → 7BR" → ['4', '5', '6', '7']
  */
 function parseUnitTypes(unitTypes: string): string[] {
   const bedrooms: string[] = [];
@@ -477,8 +494,11 @@ function parseUnitTypes(unitTypes: string): string[] {
     bedrooms.push('Studio');
   }
   
-  // Extract BR numbers
-  const brMatches = unitTypes.match(/(\d+)\s*BR/gi);
+  // Check if the range has a + suffix (e.g. "7BR+" or "6BR+")
+  const hasPlus = /\d+\s*BR\+/.test(unitTypes);
+  
+  // Extract BR numbers (strip the + for parsing)
+  const brMatches = unitTypes.match(/(\d+)\s*BR\+?/gi);
   if (brMatches) {
     const numbers: number[] = [];
     for (const m of brMatches) {
@@ -487,21 +507,23 @@ function parseUnitTypes(unitTypes: string): string[] {
     }
     
     if (numbers.length >= 2) {
-      // Range like 1BR → 4BR
       const min = Math.min(...numbers);
       const max = Math.max(...numbers);
-      for (let i = min; i <= Math.min(max, 7); i++) {
+      for (let i = min; i < max; i++) {
         bedrooms.push(i.toString());
       }
+      // Last number: if original had +, mark it as "X+"
+      if (hasPlus) {
+        bedrooms.push(`${max}+`);
+      } else {
+        bedrooms.push(max.toString());
+      }
     } else if (numbers.length === 1) {
-      bedrooms.push(numbers[0].toString());
-    }
-  }
-  
-  // Check for 7BR+ or similar
-  if (unitTypes.includes('+')) {
-    if (!bedrooms.includes('7+')) {
-      bedrooms.push('7+');
+      if (hasPlus) {
+        bedrooms.push(`${numbers[0]}+`);
+      } else {
+        bedrooms.push(numbers[0].toString());
+      }
     }
   }
   
@@ -509,7 +531,8 @@ function parseUnitTypes(unitTypes: string): string[] {
 }
 
 /**
- * Get bedroom options based on property type, budget, and area
+ * Get bedroom options based on property type, budget, and area.
+ * Uses PRODUCT_TYPE_MAP to match "Apartment" → "Apartments", "Villa" → "Villas"/"Mansions", etc.
  */
 export function getBedroomsByTypeAndBudget(
   propertyType: string,
@@ -518,8 +541,13 @@ export function getBedroomsByTypeAndBudget(
 ): { label: string; value: string }[] {
   const bedroomSet = new Set<string>();
   
-  // Normalize property type for matching
-  const normalizedType = propertyType.toLowerCase();
+  // Build reverse map: display type → dataset types
+  const datasetTypes: string[] = [];
+  for (const [dataKey, displayVal] of Object.entries(PRODUCT_TYPE_MAP)) {
+    if (displayVal.toLowerCase() === propertyType.toLowerCase()) {
+      datasetTypes.push(dataKey.toLowerCase());
+    }
+  }
   
   const locationsToCheck = area
     ? LOCATIONS.filter(loc => loc.value === area)
@@ -527,8 +555,7 @@ export function getBedroomsByTypeAndBudget(
     
   for (const loc of locationsToCheck) {
     for (const p of loc.products) {
-      const pTypeNorm = p.type.toLowerCase().replace(/s$/, '');
-      if (pTypeNorm === normalizedType || p.type.toLowerCase() === normalizedType || p.type.toLowerCase() === normalizedType + 's') {
+      if (datasetTypes.includes(p.type.toLowerCase())) {
         if (budget <= 0 || (budget >= p.minBudget && budget <= p.maxBudget)) {
           const brs = parseUnitTypes(p.unitTypes);
           brs.forEach(br => bedroomSet.add(br));
@@ -548,10 +575,12 @@ export function getBedroomsByTypeAndBudget(
     return aNum - bNum;
   });
   
-  return sorted.map(br => ({
-    label: br === 'Studio' ? 'Studio' : br.includes('+') ? `${br} Bedrooms` : `${br} Bedroom${parseInt(br) > 1 ? 's' : ''}`,
-    value: br,
-  }));
+  return sorted.map(br => {
+    if (br === 'Studio') return { label: 'Studio', value: 'Studio' };
+    if (br.includes('+')) return { label: `${br} Bedrooms`, value: br };
+    const n = parseInt(br);
+    return { label: `${br} Bedroom${n > 1 ? 's' : ''}`, value: br };
+  });
 }
 
 /**
