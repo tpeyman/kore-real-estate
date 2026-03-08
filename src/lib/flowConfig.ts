@@ -114,7 +114,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_area', text: 'Which area do you prefer?', subtitle: 'Locations filtered based on your budget', type: 'autocomplete', dynamicOptions: getBudgetFilteredLocations('buyer_budget') },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('buyer_budget', 'buyer_area') },
     { id: 'buyer_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.buyer_property_type === 'Other' },
-    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('buyer_property_type', 'buyer_budget', 'buyer_area') },
+    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('buyer_property_type') },
     { id: 'buyer_timeline', text: 'What is your timeline?', type: 'select', options: TIMELINE },
     { id: 'buyer_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
   ],
