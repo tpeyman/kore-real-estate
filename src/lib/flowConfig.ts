@@ -96,15 +96,10 @@ function getDynamicPropertyTypes(budgetKey: string, areaKey: string) {
   };
 }
 
-function getDynamicBedrooms(propertyTypeKey: string, budgetKey: string, areaKey: string) {
-  return (answers: Record<string, string>): QuestionOption[] => {
-    const propertyType = answers[propertyTypeKey] || '';
-    if (propertyType === 'Other') return FALLBACK_BEDROOMS;
-    const budgetStr = answers[budgetKey] || '';
-    const budget = parseBudget(budgetStr);
-    const area = answers[areaKey] || '';
-    const bedrooms = getBedroomsByTypeAndBudget(propertyType, budget, area);
-    return bedrooms.length > 0 ? bedrooms : FALLBACK_BEDROOMS;
+function getDynamicBedrooms(_propertyTypeKey: string, _budgetKey: string, _areaKey: string) {
+  return (_answers: Record<string, string>): QuestionOption[] => {
+    // Always return the full static bedroom list
+    return FALLBACK_BEDROOMS;
   };
 }
 
