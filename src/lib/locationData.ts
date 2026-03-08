@@ -407,6 +407,41 @@ export function getLocationsByBudget(budget: number): { label: string; value: st
 }
 
 /**
+ * Filter locations where at least one product's rent range fits the given annual budget.
+ * Shows matching product types and starting rent in suggestions.
+ */
+export function getLocationsByRentBudget(annualBudget: number): { label: string; value: string; matchingProducts: string[]; startingRent: number }[] {
+  if (annualBudget <= 0) {
+    return LOCATIONS
+      .filter(loc => loc.products.some(p => p.minRent != null))
+      .map(loc => {
+        const rentProducts = loc.products.filter(p => p.minRent != null);
+        const lowestRent = Math.min(...rentProducts.map(p => p.minRent!));
+        return {
+          label: loc.name,
+          value: loc.value,
+          matchingProducts: rentProducts.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
+          startingRent: lowestRent,
+        };
+      });
+  }
+
+  return LOCATIONS
+    .map(loc => {
+      const matching = loc.products.filter(p => p.minRent != null && annualBudget >= p.minRent!);
+      if (matching.length === 0) return null;
+      const lowestRent = Math.min(...matching.map(p => p.minRent!));
+      return {
+        label: loc.name,
+        value: loc.value,
+        matchingProducts: matching.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
+        startingRent: lowestRent,
+      };
+    })
+    .filter(Boolean) as { label: string; value: string; matchingProducts: string[]; startingRent: number }[];
+}
+
+/**
  * Get all locations as simple QuestionOption[] (no budget filter).
  */
 export function getAllLocationOptions(): { label: string; value: string }[] {
