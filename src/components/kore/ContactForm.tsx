@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import PhoneInputField from './PhoneInputField';
 import type { ContactInfo } from '@/lib/flowConfig';
+import { LANGUAGE_OPTIONS } from '@/lib/flowConfig';
 
 type VerifyMethod = 'email' | 'phone' | null;
 
