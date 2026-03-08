@@ -211,24 +211,6 @@ export const FLOWS: Record<LeadType, Question[]> = {
       { label: 'Lifestyle / End Use', value: 'Lifestyle' },
       { label: 'Portfolio Diversification', value: 'Portfolio' },
     ]},
-    { id: 'luxury_asset_type', text: 'What type of asset are you looking for?', type: 'select', hasOther: true, condition: a => a.luxury_budget !== 'Below 3M', options: [
-      { label: 'Branded Residences', value: 'Branded' },
-      { label: 'Golf Community', value: 'Golf' },
-      { label: 'Waterfront / Beachfront', value: 'Waterfront' },
-      { label: 'Ultra Luxury Villa', value: 'Ultra Villa' },
-      { label: 'Other', value: 'Other' },
-    ]},
-    { id: 'luxury_asset_type_other', text: 'Please specify the asset type', type: 'text', condition: a => a.luxury_budget !== 'Below 3M' && a.luxury_asset_type === 'Other' },
-    { id: 'luxury_bedrooms', text: 'How many bedrooms?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: getDynamicBedrooms('luxury_asset_type', 'luxury_budget', '') },
-    { id: 'luxury_dp_ready', text: 'Is your down payment ready?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
-    { id: 'luxury_payment_pref', text: 'Preferred payment structure?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [
-      { label: 'Full Cash', value: 'Cash' },
-      { label: 'Post-Handover Plan', value: 'Post-Handover' },
-      { label: 'Developer Plan', value: 'Developer Plan' },
-      { label: 'Flexible', value: 'Flexible' },
-    ]},
-    { id: 'luxury_timeline', text: 'What is your timeline?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: TIMELINE },
-    { id: 'luxury_residency', text: 'Interested in residency or structuring?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }, { label: 'Not Sure', value: 'Not Sure' }] },
     { id: 'luxury_location', text: 'Preferred prime location?', type: 'autocomplete', condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: (answers) => {
       const budget = parseBudget(answers.luxury_budget || '');
       if (budget >= 3000000) {
@@ -238,14 +220,20 @@ export const FLOWS: Record<LeadType, Question[]> = {
           matchingProducts: loc.matchingProducts,
         }));
       }
-      return [
-        { label: 'Palm Jumeirah', value: 'Palm Jumeirah' },
-        { label: 'Emirates Hills', value: 'Emirates Hills' },
-        { label: 'Dubai Hills Estate', value: 'Dubai Hills Estate' },
-        { label: 'District One', value: 'District One' },
-        { label: 'Jumeirah Bay Island', value: 'Jumeirah Bay Island' },
-      ];
+      return getAllLocationOptions();
     }},
+    { id: 'luxury_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: getDynamicPropertyTypes('luxury_budget', 'luxury_location') },
+    { id: 'luxury_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.luxury_budget !== 'Below 3M' && a.luxury_property_type === 'Other' },
+    { id: 'luxury_bedrooms', text: 'How many bedrooms?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', dynamicOptions: getDynamicBedrooms('luxury_property_type', 'luxury_budget', 'luxury_location') },
+    { id: 'luxury_dp_ready', text: 'Is your down payment ready?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
+    { id: 'luxury_payment_pref', text: 'Preferred payment structure?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [
+      { label: 'Full Cash', value: 'Cash' },
+      { label: 'Post-Handover Plan', value: 'Post-Handover' },
+      { label: 'Developer Plan', value: 'Developer Plan' },
+      { label: 'Flexible', value: 'Flexible' },
+    ]},
+    { id: 'luxury_timeline', text: 'What is your timeline?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: TIMELINE },
+    { id: 'luxury_residency', text: 'Interested in residency or structuring?', type: 'select', condition: a => a.luxury_budget !== 'Below 3M', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }, { label: 'Not Sure', value: 'Not Sure' }] },
   ],
 };
 
