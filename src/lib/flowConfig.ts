@@ -168,7 +168,14 @@ export const FLOWS: Record<LeadType, Question[]> = {
       return types.length > 1 ? types : FALLBACK_PROPERTY_TYPES;
     }},
     { id: 'tenant_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.tenant_property_type === 'Other' },
-    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('tenant_property_type') },
+    { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: (answers) => {
+      const propertyType = answers.tenant_property_type || '';
+      if (!propertyType || propertyType === 'Other') return ALL_BEDROOMS;
+      const budget = parseBudget(answers.tenant_budget || '');
+      const area = answers.tenant_area || '';
+      const bedrooms = getBedroomsByTypeAndRentBudget(propertyType, budget, area);
+      return bedrooms.length > 0 ? bedrooms : getBedroomsForPropertyType(propertyType);
+    }},
     { id: 'tenant_timeline', text: 'When do you need to move in?', type: 'select', options: TIMELINE },
     { id: 'tenant_cheques', text: 'Preferred payment method?', type: 'select', options: [
       { label: '1 Cheque', value: '1 Cheque' },
