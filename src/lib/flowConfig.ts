@@ -63,6 +63,7 @@ import {
   getLocationsByRentBudget,
   parseBudget, 
   getPropertyTypesByBudgetAndArea,
+  getPropertyTypesByRentBudgetAndArea,
   formatNumberWithCommas,
 } from './locationData';
 import { PROPERTY_TYPES_WITH_OTHER } from '@/constants/propertyTypes';
@@ -158,7 +159,13 @@ export const FLOWS: Record<LeadType, Question[]> = {
         matchingProducts: [`From AED ${formatNumberWithCommas(loc.startingRent)}/yr`, ...loc.matchingProducts],
       }));
     }},
-    { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'tenant_area') },
+    { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: (answers) => {
+      const budgetStr = answers.tenant_budget || '';
+      const budget = parseBudget(budgetStr);
+      const area = answers.tenant_area || '';
+      const types = getPropertyTypesByRentBudgetAndArea(budget, area);
+      return types.length > 1 ? types : FALLBACK_PROPERTY_TYPES;
+    }},
     { id: 'tenant_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.tenant_property_type === 'Other' },
     { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('tenant_property_type') },
     { id: 'tenant_timeline', text: 'When do you need to move in?', type: 'select', options: TIMELINE },
