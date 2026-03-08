@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import OtpVerification from './OtpVerification';
 import PhoneInputField from './PhoneInputField';
 import { supabase } from '@/integrations/supabase/client';
+import { LANGUAGE_OPTIONS } from '@/lib/flowConfig';
 
 interface JobData {
   cvFileName: string;
