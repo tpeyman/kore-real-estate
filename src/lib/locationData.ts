@@ -382,11 +382,10 @@ function parseShorthand(num: string, suffix: string): number {
  */
 export function getLocationsByBudget(budget: number): { label: string; value: string; matchingProducts: string[] }[] {
   if (budget <= 0) {
-    // No budget filter — return all locations
     return LOCATIONS.map(loc => ({
       label: loc.name,
       value: loc.value,
-      matchingProducts: loc.products.map(p => p.type),
+      matchingProducts: loc.products.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
     }));
   }
 
@@ -397,7 +396,7 @@ export function getLocationsByBudget(budget: number): { label: string; value: st
       return {
         label: loc.name,
         value: loc.value,
-        matchingProducts: matching.map(p => p.type),
+        matchingProducts: matching.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
       };
     })
     .filter(Boolean) as { label: string; value: string; matchingProducts: string[] }[];
