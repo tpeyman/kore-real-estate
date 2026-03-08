@@ -62,12 +62,10 @@ import {
   getLocationsByBudget, 
   parseBudget, 
   getPropertyTypesByBudgetAndArea,
-  getBedroomsByTypeAndBudget 
 } from './locationData';
 import { PROPERTY_TYPES_WITH_OTHER } from '@/constants/propertyTypes';
-import { BEDROOM_OPTIONS_MUTABLE } from '@/constants/bedroomOptions';
+import { getBedroomsForPropertyType, ALL_BEDROOMS } from '@/constants/bedroomOptions';
 
-const FALLBACK_BEDROOMS: QuestionOption[] = BEDROOM_OPTIONS_MUTABLE;
 const FALLBACK_PROPERTY_TYPES: QuestionOption[] = PROPERTY_TYPES_WITH_OTHER.map(o => ({ ...o }));
 
 function getBudgetFilteredLocations(budgetKey: string) {
@@ -96,10 +94,11 @@ function getDynamicPropertyTypes(budgetKey: string, areaKey: string) {
   };
 }
 
-function getDynamicBedrooms(_propertyTypeKey: string, _budgetKey: string, _areaKey: string) {
-  return (_answers: Record<string, string>): QuestionOption[] => {
-    // Always return the full static bedroom list
-    return FALLBACK_BEDROOMS;
+function getDynamicBedrooms(propertyTypeKey: string) {
+  return (answers: Record<string, string>): QuestionOption[] => {
+    const propertyType = answers[propertyTypeKey] || '';
+    if (!propertyType || propertyType === 'Other') return ALL_BEDROOMS;
+    return getBedroomsForPropertyType(propertyType);
   };
 }
 
