@@ -520,6 +520,37 @@ export function getPropertyTypesByBudgetAndArea(
 }
 
 /**
+ * Get property types filtered by annual rent budget and area.
+ */
+export function getPropertyTypesByRentBudgetAndArea(
+  rentBudget: number,
+  area?: string
+): { label: string; value: string }[] {
+  const types = new Set<string>();
+
+  const locationsToCheck = area
+    ? LOCATIONS.filter(loc => loc.value === area)
+    : LOCATIONS;
+
+  for (const loc of locationsToCheck) {
+    for (const p of loc.products) {
+      if (p.minRent == null) continue;
+      if (rentBudget <= 0 || rentBudget >= p.minRent) {
+        const displayType = PRODUCT_TYPE_MAP[p.type] || p.type;
+        types.add(displayType);
+      }
+    }
+  }
+
+  const result = PROPERTY_TYPE_ORDER
+    .filter(t => types.has(t))
+    .map(t => ({ label: t, value: t }));
+
+  result.push({ label: 'Other', value: 'Other' });
+  return result;
+}
+
+/**
  * Parse unit types string to get bedroom options.
  * "Studio → 4BR" → ['Studio', '1', '2', '3', '4']
  * "3BR → 6BR+" → ['3', '4', '5', '6+']
