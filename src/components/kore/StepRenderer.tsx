@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import type { Question } from '@/lib/flowConfig';
-import { formatNumberWithCommas, validateBudget, parseBudget, getMinBudgetAcrossLocations } from '@/lib/locationData';
+import { formatNumberWithCommas, validateBudget, validateRentBudget, parseBudget, getMinBudgetAcrossLocations } from '@/lib/locationData';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';

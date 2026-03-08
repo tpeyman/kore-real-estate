@@ -677,3 +677,78 @@ export function validateBudget(budget: number): {
   
   return { valid: true };
 }
+
+/**
+ * Get minimum annual rent across all locations
+ */
+export function getMinRentAcrossLocations(): number {
+  let minRent = Infinity;
+  for (const loc of LOCATIONS) {
+    for (const p of loc.products) {
+      if (p.minRent != null && p.minRent < minRent) {
+        minRent = p.minRent;
+      }
+    }
+  }
+  return minRent === Infinity ? 0 : minRent;
+}
+
+/**
+ * Get maximum annual rent across all locations
+ */
+export function getMaxRentAcrossLocations(): number {
+  let maxRent = 0;
+  for (const loc of LOCATIONS) {
+    for (const p of loc.products) {
+      if (p.maxRent != null && p.maxRent > maxRent) {
+        maxRent = p.maxRent;
+      }
+    }
+  }
+  return maxRent;
+}
+
+/**
+ * Validate rental budget against dataset and return suggestions
+ */
+export function validateRentBudget(budget: number): {
+  valid: boolean;
+  message?: string;
+  suggestions?: { label: string; value: string }[];
+  minBudget?: number;
+} {
+  if (budget <= 0) {
+    return { valid: false, message: 'Please enter a valid rental budget amount' };
+  }
+
+  const minRent = getMinRentAcrossLocations();
+  const maxRent = getMaxRentAcrossLocations();
+
+  if (budget < minRent) {
+    return {
+      valid: false,
+      message: `Budget is below the minimum annual rent available (AED ${formatNumberWithCommas(minRent)}). Consider increasing your budget.`,
+      minBudget: minRent,
+    };
+  }
+
+  const matchingLocations = getLocationsByRentBudget(budget);
+  if (matchingLocations.length === 0) {
+    return {
+      valid: false,
+      message: 'No rental properties match this budget. Please adjust your budget.',
+      minBudget: minRent,
+    };
+  }
+
+  if (budget > maxRent * 2) {
+    const luxuryLocations = ['Palm Jumeirah', 'Downtown Dubai', 'Dubai Hills Estate', 'Bluewaters Island', 'Emirates Hills'];
+    return {
+      valid: true,
+      message: 'Excellent budget! We recommend these premium rental locations:',
+      suggestions: luxuryLocations.map(l => ({ label: l, value: l })),
+    };
+  }
+
+  return { valid: true };
+}
