@@ -436,8 +436,21 @@ export function getMaxBudgetAcrossLocations(): number {
   return max;
 }
 
+// Map dataset product types to the 4 standard display types
+const PRODUCT_TYPE_MAP: Record<string, string> = {
+  'Apartments': 'Apartment',
+  'Villas': 'Villa',
+  'Townhouses': 'Townhouse',
+  'Penthouses': 'Penthouse',
+  'Mansions': 'Villa', // Mansions mapped to Villa
+};
+
+// Canonical order for property types
+const PROPERTY_TYPE_ORDER = ['Apartment', 'Villa', 'Townhouse', 'Penthouse'];
+
 /**
- * Get available property types based on budget and optionally area
+ * Get available property types based on budget and optionally area.
+ * Returns exactly from: Apartment, Villa, Townhouse, Penthouse + Other
  */
 export function getPropertyTypesByBudgetAndArea(
   budget: number,
@@ -452,14 +465,17 @@ export function getPropertyTypesByBudgetAndArea(
   for (const loc of locationsToCheck) {
     for (const p of loc.products) {
       if (budget <= 0 || (budget >= p.minBudget && budget <= p.maxBudget)) {
-        // Normalize type names for display
-        const displayType = p.type.replace(/s$/, ''); // Remove trailing 's'
+        const displayType = PRODUCT_TYPE_MAP[p.type] || p.type;
         types.add(displayType);
       }
     }
   }
 
-  const result = Array.from(types).map(t => ({ label: t, value: t }));
+  // Sort by canonical order
+  const result = PROPERTY_TYPE_ORDER
+    .filter(t => types.has(t))
+    .map(t => ({ label: t, value: t }));
+
   // Add "Other" option
   result.push({ label: 'Other', value: 'Other' });
   return result;
