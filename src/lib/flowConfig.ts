@@ -94,14 +94,12 @@ function getDynamicBedrooms(propertyTypeKey: string, budgetKey: string, areaKey:
   return (answers: Record<string, string>): QuestionOption[] => {
     const propertyType = answers[propertyTypeKey] || '';
     if (propertyType === 'Other') {
-      // Return all standard options for "Other"
       return [
         { label: 'Studio', value: 'Studio' },
         { label: '1 Bedroom', value: '1' },
         { label: '2 Bedrooms', value: '2' },
         { label: '3 Bedrooms', value: '3' },
-        { label: '4 Bedrooms', value: '4' },
-        { label: '5+ Bedrooms', value: '5+' },
+        { label: '4+ Bedrooms', value: '4+' },
       ];
     }
     const budgetStr = answers[budgetKey] || '';

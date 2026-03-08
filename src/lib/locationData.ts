@@ -532,7 +532,8 @@ function parseUnitTypes(unitTypes: string): string[] {
 }
 
 /**
- * Get bedroom options based on property type, budget, and area
+ * Get bedroom options based on property type, budget, and area.
+ * Uses PRODUCT_TYPE_MAP to match "Apartment" → "Apartments", "Villa" → "Villas"/"Mansions", etc.
  */
 export function getBedroomsByTypeAndBudget(
   propertyType: string,
@@ -541,8 +542,13 @@ export function getBedroomsByTypeAndBudget(
 ): { label: string; value: string }[] {
   const bedroomSet = new Set<string>();
   
-  // Normalize property type for matching
-  const normalizedType = propertyType.toLowerCase();
+  // Build reverse map: display type → dataset types
+  const datasetTypes: string[] = [];
+  for (const [dataKey, displayVal] of Object.entries(PRODUCT_TYPE_MAP)) {
+    if (displayVal.toLowerCase() === propertyType.toLowerCase()) {
+      datasetTypes.push(dataKey.toLowerCase());
+    }
+  }
   
   const locationsToCheck = area
     ? LOCATIONS.filter(loc => loc.value === area)
@@ -550,8 +556,7 @@ export function getBedroomsByTypeAndBudget(
     
   for (const loc of locationsToCheck) {
     for (const p of loc.products) {
-      const pTypeNorm = p.type.toLowerCase().replace(/s$/, '');
-      if (pTypeNorm === normalizedType || p.type.toLowerCase() === normalizedType || p.type.toLowerCase() === normalizedType + 's') {
+      if (datasetTypes.includes(p.type.toLowerCase())) {
         if (budget <= 0 || (budget >= p.minBudget && budget <= p.maxBudget)) {
           const brs = parseUnitTypes(p.unitTypes);
           brs.forEach(br => bedroomSet.add(br));
@@ -571,10 +576,12 @@ export function getBedroomsByTypeAndBudget(
     return aNum - bNum;
   });
   
-  return sorted.map(br => ({
-    label: br === 'Studio' ? 'Studio' : br.includes('+') ? `${br} Bedrooms` : `${br} Bedroom${parseInt(br) > 1 ? 's' : ''}`,
-    value: br,
-  }));
+  return sorted.map(br => {
+    if (br === 'Studio') return { label: 'Studio', value: 'Studio' };
+    if (br.includes('+')) return { label: `${br} Bedrooms`, value: br };
+    const n = parseInt(br);
+    return { label: `${br} Bedroom${n > 1 ? 's' : ''}`, value: br };
+  });
 }
 
 /**
