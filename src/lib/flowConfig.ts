@@ -64,6 +64,7 @@ import {
   parseBudget, 
   getPropertyTypesByBudgetAndArea,
   getPropertyTypesByRentBudgetAndArea,
+  getBedroomsByTypeAndRentBudget,
   formatNumberWithCommas,
 } from './locationData';
 import { PROPERTY_TYPES_WITH_OTHER } from '@/constants/propertyTypes';
