@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import OtpVerification from './OtpVerification';
 import PhoneInputField from './PhoneInputField';
 import { supabase } from '@/integrations/supabase/client';
+import { LANGUAGE_OPTIONS } from '@/lib/flowConfig';
 
 interface JobData {
   cvFileName: string;
@@ -224,13 +225,18 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
         );
 
       case 'location':
+        // Text-only validation - no numbers allowed
+        const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const value = e.target.value.replace(/[^a-zA-Z\s,.\-']/g, '');
+          setTextValue(value);
+        };
         return (
           <StepWrapper key="location" title="Location of Residence" subtitle="Where are you currently based?">
             <div className="space-y-4">
               <input
                 type="text"
                 value={textValue}
-                onChange={(e) => setTextValue(e.target.value)}
+                onChange={handleLocationChange}
                 onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit('location', 'experience')}
                 placeholder="e.g. Dubai, UAE"
                 autoFocus
@@ -369,14 +375,9 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                 className={inputClass}
               >
                 <option value="">Preferred Language</option>
-                <option value="English">English</option>
-                <option value="Arabic">Arabic</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Urdu">Urdu</option>
-                <option value="Russian">Russian</option>
-                <option value="Chinese">Chinese</option>
-                <option value="French">French</option>
-                <option value="Other">Other</option>
+                {LANGUAGE_OPTIONS.map(lang => (
+                  <option key={lang.value} value={lang.value}>{lang.label}</option>
+                ))}
               </select>
 
               <motion.button

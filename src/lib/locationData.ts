@@ -409,3 +409,203 @@ export function getLocationsByBudget(budget: number): { label: string; value: st
 export function getAllLocationOptions(): { label: string; value: string }[] {
   return LOCATIONS.map(loc => ({ label: loc.name, value: loc.value }));
 }
+
+/**
+ * Get minimum budget across all locations and products
+ */
+export function getMinBudgetAcrossLocations(): number {
+  let min = Infinity;
+  for (const loc of LOCATIONS) {
+    for (const p of loc.products) {
+      if (p.minBudget < min) min = p.minBudget;
+    }
+  }
+  return min === Infinity ? 0 : min;
+}
+
+/**
+ * Get maximum budget across all locations and products
+ */
+export function getMaxBudgetAcrossLocations(): number {
+  let max = 0;
+  for (const loc of LOCATIONS) {
+    for (const p of loc.products) {
+      if (p.maxBudget > max) max = p.maxBudget;
+    }
+  }
+  return max;
+}
+
+/**
+ * Get available property types based on budget and optionally area
+ */
+export function getPropertyTypesByBudgetAndArea(
+  budget: number,
+  area?: string
+): { label: string; value: string }[] {
+  const types = new Set<string>();
+
+  const locationsToCheck = area
+    ? LOCATIONS.filter(loc => loc.value === area)
+    : LOCATIONS;
+
+  for (const loc of locationsToCheck) {
+    for (const p of loc.products) {
+      if (budget <= 0 || (budget >= p.minBudget && budget <= p.maxBudget)) {
+        // Normalize type names for display
+        const displayType = p.type.replace(/s$/, ''); // Remove trailing 's'
+        types.add(displayType);
+      }
+    }
+  }
+
+  const result = Array.from(types).map(t => ({ label: t, value: t }));
+  // Add "Other" option
+  result.push({ label: 'Other', value: 'Other' });
+  return result;
+}
+
+/**
+ * Parse unit types string to get bedroom options
+ * e.g. "Studio → 4BR" returns ['Studio', '1', '2', '3', '4']
+ */
+function parseUnitTypes(unitTypes: string): string[] {
+  const bedrooms: string[] = [];
+  
+  // Check if Studio is included
+  if (unitTypes.toLowerCase().includes('studio')) {
+    bedrooms.push('Studio');
+  }
+  
+  // Extract BR numbers
+  const brMatches = unitTypes.match(/(\d+)\s*BR/gi);
+  if (brMatches) {
+    const numbers: number[] = [];
+    for (const m of brMatches) {
+      const n = parseInt(m);
+      if (!isNaN(n)) numbers.push(n);
+    }
+    
+    if (numbers.length >= 2) {
+      // Range like 1BR → 4BR
+      const min = Math.min(...numbers);
+      const max = Math.max(...numbers);
+      for (let i = min; i <= Math.min(max, 7); i++) {
+        bedrooms.push(i.toString());
+      }
+    } else if (numbers.length === 1) {
+      bedrooms.push(numbers[0].toString());
+    }
+  }
+  
+  // Check for 7BR+ or similar
+  if (unitTypes.includes('+')) {
+    if (!bedrooms.includes('7+')) {
+      bedrooms.push('7+');
+    }
+  }
+  
+  return bedrooms;
+}
+
+/**
+ * Get bedroom options based on property type, budget, and area
+ */
+export function getBedroomsByTypeAndBudget(
+  propertyType: string,
+  budget: number,
+  area?: string
+): { label: string; value: string }[] {
+  const bedroomSet = new Set<string>();
+  
+  // Normalize property type for matching
+  const normalizedType = propertyType.toLowerCase();
+  
+  const locationsToCheck = area
+    ? LOCATIONS.filter(loc => loc.value === area)
+    : LOCATIONS;
+    
+  for (const loc of locationsToCheck) {
+    for (const p of loc.products) {
+      const pTypeNorm = p.type.toLowerCase().replace(/s$/, '');
+      if (pTypeNorm === normalizedType || p.type.toLowerCase() === normalizedType || p.type.toLowerCase() === normalizedType + 's') {
+        if (budget <= 0 || (budget >= p.minBudget && budget <= p.maxBudget)) {
+          const brs = parseUnitTypes(p.unitTypes);
+          brs.forEach(br => bedroomSet.add(br));
+        }
+      }
+    }
+  }
+  
+  // Convert to sorted array
+  const sorted = Array.from(bedroomSet).sort((a, b) => {
+    if (a === 'Studio') return -1;
+    if (b === 'Studio') return 1;
+    const aNum = parseInt(a);
+    const bNum = parseInt(b);
+    if (isNaN(aNum)) return 1;
+    if (isNaN(bNum)) return -1;
+    return aNum - bNum;
+  });
+  
+  return sorted.map(br => ({
+    label: br === 'Studio' ? 'Studio' : br.includes('+') ? `${br} Bedrooms` : `${br} Bedroom${parseInt(br) > 1 ? 's' : ''}`,
+    value: br,
+  }));
+}
+
+/**
+ * Format a number with commas (e.g., 1500000 → "1,500,000")
+ */
+export function formatNumberWithCommas(value: string | number): string {
+  const numStr = typeof value === 'number' ? value.toString() : value;
+  const cleaned = numStr.replace(/[^\d]/g, '');
+  if (!cleaned) return '';
+  return parseInt(cleaned).toLocaleString('en-US');
+}
+
+/**
+ * Validate budget against dataset and return suggestions
+ */
+export function validateBudget(budget: number): {
+  valid: boolean;
+  message?: string;
+  suggestions?: { label: string; value: string }[];
+  minBudget?: number;
+} {
+  if (budget <= 0) {
+    return { valid: false, message: 'Please enter a valid budget amount' };
+  }
+  
+  const minBudget = getMinBudgetAcrossLocations();
+  const maxBudget = getMaxBudgetAcrossLocations();
+  
+  if (budget < minBudget) {
+    return {
+      valid: false,
+      message: `Budget is below the minimum available (AED ${formatNumberWithCommas(minBudget)}). Consider increasing your budget.`,
+      minBudget,
+    };
+  }
+  
+  const matchingLocations = getLocationsByBudget(budget);
+  if (matchingLocations.length === 0) {
+    return {
+      valid: false,
+      message: 'No properties match this budget. Please adjust your budget.',
+      minBudget,
+    };
+  }
+  
+  if (budget > maxBudget * 2) {
+    // Very high budget - suggest luxury locations
+    const luxuryLocations = ['Palm Jumeirah', 'Dubai Hills Estate', 'Tilal Al Ghaf', 'Jumeirah Islands', 'Jumeirah Golf Estates'];
+    return {
+      valid: true,
+      message: 'Excellent budget! We recommend these premium locations:',
+      suggestions: luxuryLocations.map(l => ({ label: l, value: l })),
+    };
+  }
+  
+  return { valid: true };
+}

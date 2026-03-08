@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import PhoneInputField from './PhoneInputField';
 import type { ContactInfo } from '@/lib/flowConfig';
+import { LANGUAGE_OPTIONS } from '@/lib/flowConfig';
 
 type VerifyMethod = 'email' | 'phone' | null;
 
@@ -90,14 +91,9 @@ const ContactForm = ({ onSubmit, onBack, onRequestOtp, emailVerified: externalVe
 
         <select value={form.preferredLanguage} onChange={(e) => update('preferredLanguage', e.target.value)} className={inputClass}>
           <option value="">Preferred Language</option>
-          <option value="English">English</option>
-          <option value="Arabic">Arabic</option>
-          <option value="Hindi">Hindi</option>
-          <option value="Urdu">Urdu</option>
-          <option value="Russian">Russian</option>
-          <option value="Chinese">Chinese</option>
-          <option value="French">French</option>
-          <option value="Other">Other</option>
+          {LANGUAGE_OPTIONS.map(lang => (
+            <option key={lang.value} value={lang.value}>{lang.label}</option>
+          ))}
         </select>
 
         <motion.button
