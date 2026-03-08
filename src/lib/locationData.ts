@@ -1,8 +1,10 @@
 export interface ProductPricing {
   type: string; // e.g. 'Apartments', 'Villas', 'Townhouses', 'Penthouses', 'Mansions'
   unitTypes: string; // e.g. 'Studio → 4BR'
-  minBudget: number; // in AED
-  maxBudget: number; // in AED
+  minBudget: number; // in AED (purchase)
+  maxBudget: number; // in AED (purchase)
+  minRent?: number; // annual rent in AED
+  maxRent?: number; // annual rent in AED
 }
 
 export interface LocationData {
