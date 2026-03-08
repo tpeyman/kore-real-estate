@@ -114,7 +114,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'buyer_area', text: 'Which area do you prefer?', subtitle: 'Locations filtered based on your budget', type: 'autocomplete', dynamicOptions: getBudgetFilteredLocations('buyer_budget') },
     { id: 'buyer_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('buyer_budget', 'buyer_area') },
     { id: 'buyer_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.buyer_property_type === 'Other' },
-    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('buyer_property_type'e?', type: 'select', options: TIMELINE },
+    { id: 'buyer_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('buyer_property_type'TIMELINE },
     { id: 'buyer_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
   ],
 
@@ -123,7 +123,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'seller_property_type', text: 'What type of property are you selling?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'seller_community') },
     { id: 'seller_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.seller_property_type === 'Other' },
     { id: 'seller_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('seller_property_type', '', 'seller_community') },
- , text: 'Is your property readselect', options: [{ label: 'Ready', value: 'Ready' }, { label: 'Off-Plan', value: 'Off-Plan' }] },
+ , text: 'Is your property readselect', options: [{ label: 'R { label: 'Off-Plan', value: 'Off-Plan' }] },
     { id: 'seller_payment_status', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Mortgage', value: 'Mortgage' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.seller_status === 'Ready' },
     { id: 'seller_offplan_payment', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.seller_status === 'Off-Plan' },
     { id: 'seller_outstanding', text: 'What is the outstanding amount?', type: 'budget', subtitle: 'Enter amount in AED', condition: a => a.seller_payment_status === 'Mortgage' || a.seller_payment_status === 'Payment Plan' || a.seller_offplan_payment === 'Payment Plan' },
@@ -141,8 +141,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'tenant_property_type', text: 'What type of property are you looking for?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'tenant_area') },
     { id: 'tenant_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.tenant_property_type === 'Other' },
     { id: 'tenant_bedrooms', text: 'How many bedrooms do you need?', type: 'select', dynamicOptions: getDynamicBedrooms('tenant_property_type', '', 'tenant_area') },
-    { id: 'tenant_timeline', teed to move in?', type: 'select', options: TIMELINE },
-    { id: 'tenant_cheques', text: 'Preferred payment method?', type: 'select', options: [
+    { id: 'tenant_timeline', teed to move in?', type: 'select', options: TIMELINE },cheques', text: 'Preferred payment method?', type: 'select', options: [
       { label: '1 Cheque', value: '1 Cheque' },
       { label: '2 Cheques', value: '2 Cheques' },
       { label: '4 Cheques', value: '4 Cheques' },
@@ -157,7 +156,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'landlord_property_type', text: 'What type of property are you listing?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'landlord_community') },
     { id: 'landlord_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.landlord_property_type === 'Other' },
     { id: 'landlord_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('landlord_property_type', '', 'landlord_community') },
-    { id: 'landlord_status', text: 'Is your property ready or off-plan?', type: 'select', options: [{ label: 'Ready', value: 'Ready' }, { label: 'Off-Plan', value: 'Off-Plan' }] },
+    { id: 'landlord_status', text: 'Is youan?', type: 'select', options: [{ label: 'Ready', value: 'Ready' }, { label: 'Off-Plan', value: 'Off-Plan' }] },
     { id: 'landlord_offplan_payment', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.landlord_status === 'Off-Plan' },
     { id: 'landlord_occupancy', text: 'Is the property vacant or tenanted?', type: 'select', options: [{ label: 'Vacant', value: 'Vacant' }, { label: 'Tenanted', value: 'Tenanted' }] },
     { id: 'landlord_contract_expiry', text: 'When does the tenancy contract expire?', type: 'calendar', subtitle: 'Select the contract expiry date', condition: a => a.landlord_occupancy === 'Tenanted' },
