@@ -160,16 +160,12 @@ export const FLOWS: Record<LeadType, Question[]> = {
   ],
 
   landlord: [
-    { id: 'landlord_property_type', text: 'What type of property are you listing?', type: 'select', hasOther: true, options: [
-      { label: 'Apartment', value: 'Apartment' },
-      { label: 'Villa', value: 'Villa' },
-      { label: 'Townhouse', value: 'Townhouse' },
-      { label: 'Other', value: 'Other' },
-    ]},
+    { id: 'landlord_community', text: 'Which community is your property in?', type: 'autocomplete', subtitle: 'Select from our communities', dynamicOptions: () => getAllLocationOptions() },
+    { id: 'landlord_property_type', text: 'What type of property are you listing?', type: 'select', hasOther: true, dynamicOptions: getDynamicPropertyTypes('', 'landlord_community') },
     { id: 'landlord_property_type_other', text: 'Please specify the property type', type: 'text', condition: a => a.landlord_property_type === 'Other' },
+    { id: 'landlord_bedrooms', text: 'How many bedrooms?', type: 'select', dynamicOptions: getDynamicBedrooms('landlord_property_type', '', 'landlord_community') },
     { id: 'landlord_status', text: 'Is your property ready or off-plan?', type: 'select', options: [{ label: 'Ready', value: 'Ready' }, { label: 'Off-Plan', value: 'Off-Plan' }] },
     { id: 'landlord_offplan_payment', text: 'What is the payment status?', type: 'select', options: [{ label: 'Fully Paid', value: 'Fully Paid' }, { label: 'Payment Plan', value: 'Payment Plan' }], condition: a => a.landlord_status === 'Off-Plan' },
-    { id: 'landlord_community', text: 'Which community is your property in?', type: 'autocomplete', subtitle: 'Select from our communities', options: DUBAI_AREAS },
     { id: 'landlord_occupancy', text: 'Is the property vacant or tenanted?', type: 'select', options: [{ label: 'Vacant', value: 'Vacant' }, { label: 'Tenanted', value: 'Tenanted' }] },
     { id: 'landlord_contract_expiry', text: 'When does the tenancy contract expire?', type: 'calendar', subtitle: 'Select the contract expiry date', condition: a => a.landlord_occupancy === 'Tenanted' },
     { id: 'landlord_legal_notice', text: 'Has a legal notice been served?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }], condition: a => a.landlord_occupancy === 'Tenanted' },
