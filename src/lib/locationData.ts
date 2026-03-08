@@ -1,8 +1,10 @@
 export interface ProductPricing {
   type: string; // e.g. 'Apartments', 'Villas', 'Townhouses', 'Penthouses', 'Mansions'
   unitTypes: string; // e.g. 'Studio → 4BR'
-  minBudget: number; // in AED
-  maxBudget: number; // in AED
+  minBudget: number; // in AED (purchase)
+  maxBudget: number; // in AED (purchase)
+  minRent?: number; // annual rent in AED
+  maxRent?: number; // annual rent in AED
 }
 
 export interface LocationData {
@@ -17,8 +19,8 @@ export const LOCATIONS: LocationData[] = [
     name: 'Downtown Dubai',
     value: 'Downtown Dubai',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 1100000, maxBudget: 12000000 },
-      { type: 'Penthouses', unitTypes: '3BR → 5BR+', minBudget: 8000000, maxBudget: 60000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 1100000, maxBudget: 12000000, minRent: 75000, maxRent: 600000 },
+      { type: 'Penthouses', unitTypes: '3BR → 5BR+', minBudget: 8000000, maxBudget: 60000000, minRent: 600000, maxRent: 2000000 },
       { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 6000000, maxBudget: 12000000 },
     ],
     notes: 'Premium towers (Burj Khalifa / Address branded) command 30–50% higher pricing.',
@@ -27,110 +29,112 @@ export const LOCATIONS: LocationData[] = [
     name: 'Dubai Marina',
     value: 'Dubai Marina',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 900000, maxBudget: 7000000 },
-      { type: 'Penthouses', unitTypes: '3BR → 5BR', minBudget: 7000000, maxBudget: 25000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 900000, maxBudget: 7000000, minRent: 80000, maxRent: 500000 },
+      { type: 'Penthouses', unitTypes: '3BR → 5BR', minBudget: 7000000, maxBudget: 25000000, minRent: 350000, maxRent: 1000000 },
       { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 4000000, maxBudget: 9000000 },
     ],
-    notes: 'New waterfront towers can push 2BR units above 4M.',
+    notes: 'One of Dubai\'s most popular waterfront rental communities.',
   },
   {
     name: 'Palm Jumeirah',
     value: 'Palm Jumeirah',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 2800000, maxBudget: 18000000 },
-      { type: 'Penthouses', unitTypes: '3BR → 6BR+', minBudget: 20000000, maxBudget: 150000000 },
+      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 2800000, maxBudget: 18000000, minRent: 150000, maxRent: 900000 },
+      { type: 'Penthouses', unitTypes: '3BR → 6BR+', minBudget: 20000000, maxBudget: 150000000, minRent: 600000, maxRent: 3000000 },
       { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 8000000, maxBudget: 20000000 },
-      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 18000000, maxBudget: 200000000 },
+      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 18000000, maxBudget: 200000000, minRent: 450000, maxRent: 2000000 },
     ],
-    notes: 'Ultra-luxury branded residences can exceed AED 30M+ for large units.',
+    notes: 'Ultra-luxury beachfront community.',
   },
   {
     name: 'Business Bay',
     value: 'Business Bay',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 950000, maxBudget: 8000000 },
-      { type: 'Penthouses', unitTypes: '3BR → 6BR+', minBudget: 7000000, maxBudget: 40000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 950000, maxBudget: 8000000, minRent: 70000, maxRent: 300000 },
+      { type: 'Penthouses', unitTypes: '3BR → 6BR+', minBudget: 7000000, maxBudget: 40000000, minRent: 350000, maxRent: 1000000 },
     ],
-    notes: 'Waterfront towers near the Dubai Canal command premium pricing.',
+    notes: 'Business district near Downtown.',
   },
   {
     name: 'Dubai Hills Estate',
     value: 'Dubai Hills Estate',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 1300000, maxBudget: 7000000 },
-      { type: 'Townhouses', unitTypes: '3BR → 5BR', minBudget: 3200000, maxBudget: 7000000 },
-      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 8000000, maxBudget: 60000000 },
+      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 1300000, maxBudget: 7000000, minRent: 85000, maxRent: 260000 },
+      { type: 'Townhouses', unitTypes: '3BR → 5BR', minBudget: 3200000, maxBudget: 7000000, minRent: 220000, maxRent: 400000 },
+      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 8000000, maxBudget: 60000000, minRent: 450000, maxRent: 1000000 },
     ],
+    notes: 'Master community with parks and golf course.',
   },
   {
     name: 'Jumeirah Village Circle (JVC)',
     value: 'JVC',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 550000, maxBudget: 3000000 },
-      { type: 'Townhouses', unitTypes: '2BR → 4BR', minBudget: 1800000, maxBudget: 3800000 },
-      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 4000000, maxBudget: 7000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 550000, maxBudget: 3000000, minRent: 40000, maxRent: 160000 },
+      { type: 'Townhouses', unitTypes: '2BR → 4BR', minBudget: 1800000, maxBudget: 3800000, minRent: 140000, maxRent: 200000 },
+      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 4000000, maxBudget: 7000000, minRent: 200000, maxRent: 350000 },
     ],
-    notes: 'Newer branded projects may exceed 2.5M+ for larger units.',
+    notes: 'One of Dubai\'s most affordable and fastest-growing rental areas.',
   },
   {
     name: 'Jumeirah Lake Towers (JLT)',
     value: 'JLT',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 900000, maxBudget: 6000000 },
-      { type: 'Penthouses', unitTypes: '3BR → 5BR', minBudget: 5000000, maxBudget: 20000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 4BR', minBudget: 900000, maxBudget: 6000000, minRent: 65000, maxRent: 260000 },
+      { type: 'Penthouses', unitTypes: '3BR → 5BR', minBudget: 5000000, maxBudget: 20000000, minRent: 300000, maxRent: 600000 },
     ],
-    notes: 'Cluster K, V, W waterfront towers command higher pricing.',
+    notes: 'Popular expat community near Marina and metro.',
   },
   {
     name: 'Dubai Creek Harbour',
     value: 'Dubai Creek Harbour',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 1400000, maxBudget: 6000000 },
-      { type: 'Penthouses', unitTypes: '3BR → 5BR', minBudget: 9000000, maxBudget: 35000000 },
+      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 1400000, maxBudget: 6000000, minRent: 95000, maxRent: 400000 },
+      { type: 'Penthouses', unitTypes: '3BR → 5BR', minBudget: 9000000, maxBudget: 35000000, minRent: 400000, maxRent: 1000000 },
       { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 4000000, maxBudget: 7000000 },
     ],
-    notes: 'Prices increase significantly in Creek Beach and waterfront towers.',
+    notes: 'New waterfront development by Emaar.',
   },
   {
     name: 'Arjan',
     value: 'Arjan',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 480000, maxBudget: 2200000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 480000, maxBudget: 2200000, minRent: 38000, maxRent: 150000 },
     ],
-    notes: 'Most supply consists of mid-rise buildings near Dubai Miracle Garden.',
+    notes: 'Affordable area near Miracle Garden.',
   },
   {
     name: 'Motor City',
     value: 'Motor City',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 1100000, maxBudget: 4000000 },
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3000000, maxBudget: 5000000 },
-      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 5000000, maxBudget: 9000000 },
+      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 1100000, maxBudget: 4000000, minRent: 70000, maxRent: 180000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3000000, maxBudget: 5000000, minRent: 200000, maxRent: 300000 },
+      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 5000000, maxBudget: 9000000, minRent: 250000, maxRent: 400000 },
     ],
+    notes: 'Family-oriented community with large layouts.',
   },
   {
     name: 'Dubai Sports City',
     value: 'Dubai Sports City',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 420000, maxBudget: 1800000 },
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2000000, maxBudget: 3500000 },
-      { type: 'Villas', unitTypes: '3BR → 5BR', minBudget: 3000000, maxBudget: 6000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 420000, maxBudget: 1800000, minRent: 35000, maxRent: 120000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2000000, maxBudget: 3500000, minRent: 140000, maxRent: 220000 },
+      { type: 'Villas', unitTypes: '3BR → 5BR', minBudget: 3000000, maxBudget: 6000000, minRent: 180000, maxRent: 350000 },
     ],
   },
   {
     name: 'Al Furjan',
     value: 'Al Furjan',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 650000, maxBudget: 2200000 },
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2700000, maxBudget: 4500000 },
-      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 4500000, maxBudget: 9000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 650000, maxBudget: 2200000, minRent: 50000, maxRent: 130000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2700000, maxBudget: 4500000, minRent: 170000, maxRent: 280000 },
+      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 4500000, maxBudget: 9000000, minRent: 250000, maxRent: 450000 },
     ],
   },
   {
     name: 'Discovery Gardens',
     value: 'Discovery Gardens',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 2BR', minBudget: 480000, maxBudget: 1300000 },
+      { type: 'Apartments', unitTypes: 'Studio → 2BR', minBudget: 480000, maxBudget: 1300000, minRent: 35000, maxRent: 80000 },
     ],
     notes: 'Most buildings are older Nakheel developments with large layouts.',
   },
@@ -138,39 +142,39 @@ export const LOCATIONS: LocationData[] = [
     name: 'Dubai Production City',
     value: 'Dubai Production City',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 380000, maxBudget: 1800000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 380000, maxBudget: 1800000, minRent: 30000, maxRent: 100000 },
     ],
   },
   {
     name: 'Remraam',
     value: 'Remraam',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 3BR', minBudget: 750000, maxBudget: 1900000 },
-      { type: 'Townhouses', unitTypes: '2BR → 3BR', minBudget: 1800000, maxBudget: 2800000 },
+      { type: 'Apartments', unitTypes: '1BR → 3BR', minBudget: 750000, maxBudget: 1900000, minRent: 50000, maxRent: 110000 },
+      { type: 'Townhouses', unitTypes: '2BR → 3BR', minBudget: 1800000, maxBudget: 2800000, minRent: 100000, maxRent: 160000 },
     ],
   },
   {
     name: 'Arabian Ranches',
     value: 'Arabian Ranches',
     products: [
-      { type: 'Villas', unitTypes: '3BR → 7BR', minBudget: 4500000, maxBudget: 20000000 },
-      { type: 'Townhouses', unitTypes: '2BR → 3BR', minBudget: 3500000, maxBudget: 6000000 },
+      { type: 'Villas', unitTypes: '3BR → 7BR', minBudget: 4500000, maxBudget: 20000000, minRent: 250000, maxRent: 700000 },
+      { type: 'Townhouses', unitTypes: '2BR → 3BR', minBudget: 3500000, maxBudget: 6000000, minRent: 180000, maxRent: 300000 },
     ],
   },
   {
     name: 'Arabian Ranches 2',
     value: 'Arabian Ranches 2',
     products: [
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3200000, maxBudget: 4800000 },
-      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 5500000, maxBudget: 12000000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3200000, maxBudget: 4800000, minRent: 200000, maxRent: 320000 },
+      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 5500000, maxBudget: 12000000, minRent: 300000, maxRent: 550000 },
     ],
   },
   {
     name: 'Arabian Ranches 3',
     value: 'Arabian Ranches 3',
     products: [
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2600000, maxBudget: 4200000 },
-      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 4500000, maxBudget: 8000000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2600000, maxBudget: 4200000, minRent: 170000, maxRent: 280000 },
+      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 4500000, maxBudget: 8000000, minRent: 280000, maxRent: 450000 },
     ],
     notes: 'Many units are still under construction / recently handed over.',
   },
@@ -178,17 +182,17 @@ export const LOCATIONS: LocationData[] = [
     name: 'DAMAC Hills',
     value: 'DAMAC Hills',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 650000, maxBudget: 2600000 },
-      { type: 'Townhouses', unitTypes: '3BR → 5BR', minBudget: 2500000, maxBudget: 5500000 },
-      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 5000000, maxBudget: 20000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 650000, maxBudget: 2600000, minRent: 45000, maxRent: 150000 },
+      { type: 'Townhouses', unitTypes: '3BR → 5BR', minBudget: 2500000, maxBudget: 5500000, minRent: 170000, maxRent: 350000 },
+      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 5000000, maxBudget: 20000000, minRent: 300000, maxRent: 800000 },
     ],
   },
   {
     name: 'DAMAC Hills 2',
     value: 'DAMAC Hills 2',
     products: [
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 1400000, maxBudget: 2400000 },
-      { type: 'Villas', unitTypes: '3BR → 6BR', minBudget: 2200000, maxBudget: 4500000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 1400000, maxBudget: 2400000, minRent: 90000, maxRent: 160000 },
+      { type: 'Villas', unitTypes: '3BR → 6BR', minBudget: 2200000, maxBudget: 4500000, minRent: 120000, maxRent: 280000 },
     ],
     notes: 'One of the most affordable townhouse communities in Dubai.',
   },
@@ -196,32 +200,32 @@ export const LOCATIONS: LocationData[] = [
     name: 'Tilal Al Ghaf',
     value: 'Tilal Al Ghaf',
     products: [
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3000000, maxBudget: 4500000 },
-      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 7000000, maxBudget: 18000000 },
-      { type: 'Mansions', unitTypes: '6BR → 8BR+', minBudget: 30000000, maxBudget: 120000000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3000000, maxBudget: 4500000, minRent: 220000, maxRent: 350000 },
+      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 7000000, maxBudget: 18000000, minRent: 400000, maxRent: 900000 },
+      { type: 'Mansions', unitTypes: '6BR → 8BR+', minBudget: 30000000, maxBudget: 120000000, minRent: 1000000, maxRent: 3000000 },
     ],
   },
   {
     name: 'Mudon',
     value: 'Mudon',
     products: [
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2700000, maxBudget: 4000000 },
-      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 4500000, maxBudget: 7000000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2700000, maxBudget: 4000000, minRent: 160000, maxRent: 260000 },
+      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 4500000, maxBudget: 7000000, minRent: 250000, maxRent: 400000 },
     ],
   },
   {
     name: 'Villanova',
     value: 'Villanova',
     products: [
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2300000, maxBudget: 3600000 },
-      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 3800000, maxBudget: 6000000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2300000, maxBudget: 3600000, minRent: 150000, maxRent: 250000 },
+      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 3800000, maxBudget: 6000000, minRent: 230000, maxRent: 380000 },
     ],
   },
   {
     name: 'The Villa (Dubailand)',
     value: 'The Villa',
     products: [
-      { type: 'Villas', unitTypes: '4BR → 7BR', minBudget: 5000000, maxBudget: 14000000 },
+      { type: 'Villas', unitTypes: '4BR → 7BR', minBudget: 5000000, maxBudget: 14000000, minRent: 250000, maxRent: 500000 },
     ],
     notes: 'Large Spanish-style villas developed by Dubai Properties.',
   },
@@ -229,8 +233,8 @@ export const LOCATIONS: LocationData[] = [
     name: 'Emaar Beachfront',
     value: 'Emaar Beachfront',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 2600000, maxBudget: 12000000 },
-      { type: 'Penthouses', unitTypes: '4BR → 6BR+', minBudget: 15000000, maxBudget: 80000000 },
+      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 2600000, maxBudget: 12000000, minRent: 140000, maxRent: 600000 },
+      { type: 'Penthouses', unitTypes: '4BR → 6BR+', minBudget: 15000000, maxBudget: 80000000, minRent: 500000, maxRent: 2000000 },
     ],
     notes: 'Sea-facing units command 20–35% premiums.',
   },
@@ -238,9 +242,9 @@ export const LOCATIONS: LocationData[] = [
     name: 'Bluewaters Island',
     value: 'Bluewaters Island',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 3000000, maxBudget: 13000000 },
-      { type: 'Penthouses', unitTypes: '4BR → 6BR', minBudget: 18000000, maxBudget: 55000000 },
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 8000000, maxBudget: 16000000 },
+      { type: 'Apartments', unitTypes: '1BR → 4BR', minBudget: 3000000, maxBudget: 13000000, minRent: 160000, maxRent: 700000 },
+      { type: 'Penthouses', unitTypes: '4BR → 6BR', minBudget: 18000000, maxBudget: 55000000, minRent: 600000, maxRent: 2000000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 8000000, maxBudget: 16000000, minRent: 400000, maxRent: 700000 },
     ],
     notes: 'Premium units facing Ain Dubai achieve the highest pricing.',
   },
@@ -248,7 +252,7 @@ export const LOCATIONS: LocationData[] = [
     name: 'Jumeirah Islands',
     value: 'Jumeirah Islands',
     products: [
-      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 8000000, maxBudget: 25000000 },
+      { type: 'Villas', unitTypes: '4BR → 6BR', minBudget: 8000000, maxBudget: 25000000, minRent: 350000, maxRent: 800000 },
     ],
     notes: 'Prices vary significantly based on lake frontage and renovations.',
   },
@@ -256,7 +260,7 @@ export const LOCATIONS: LocationData[] = [
     name: 'Jumeirah Park',
     value: 'Jumeirah Park',
     products: [
-      { type: 'Villas', unitTypes: '3BR → 5BR', minBudget: 5000000, maxBudget: 12000000 },
+      { type: 'Villas', unitTypes: '3BR → 5BR', minBudget: 5000000, maxBudget: 12000000, minRent: 250000, maxRent: 500000 },
     ],
     notes: 'Large plot sizes make this area attractive for European family buyers.',
   },
@@ -264,9 +268,9 @@ export const LOCATIONS: LocationData[] = [
     name: 'Jumeirah Golf Estates',
     value: 'Jumeirah Golf Estates',
     products: [
-      { type: 'Apartments', unitTypes: '1BR → 3BR', minBudget: 1300000, maxBudget: 3000000 },
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3500000, maxBudget: 6000000 },
-      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 7000000, maxBudget: 40000000 },
+      { type: 'Apartments', unitTypes: '1BR → 3BR', minBudget: 1300000, maxBudget: 3000000, minRent: 80000, maxRent: 180000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 3500000, maxBudget: 6000000, minRent: 220000, maxRent: 380000 },
+      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 7000000, maxBudget: 40000000, minRent: 400000, maxRent: 1500000 },
     ],
     notes: 'Homes overlooking Earth Course golf course command premium pricing.',
   },
@@ -274,18 +278,18 @@ export const LOCATIONS: LocationData[] = [
     name: 'Dubai South',
     value: 'Dubai South',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 420000, maxBudget: 1800000 },
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 1900000, maxBudget: 3300000 },
-      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 3300000, maxBudget: 6000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 420000, maxBudget: 1800000, minRent: 30000, maxRent: 100000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 1900000, maxBudget: 3300000, minRent: 120000, maxRent: 200000 },
+      { type: 'Villas', unitTypes: '4BR → 5BR', minBudget: 3300000, maxBudget: 6000000, minRent: 180000, maxRent: 320000 },
     ],
   },
   {
     name: 'Dubailand',
     value: 'Dubailand',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 450000, maxBudget: 2000000 },
-      { type: 'Townhouses', unitTypes: '3BR → 5BR', minBudget: 2000000, maxBudget: 4500000 },
-      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 4000000, maxBudget: 12000000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 450000, maxBudget: 2000000, minRent: 35000, maxRent: 120000 },
+      { type: 'Townhouses', unitTypes: '3BR → 5BR', minBudget: 2000000, maxBudget: 4500000, minRent: 140000, maxRent: 280000 },
+      { type: 'Villas', unitTypes: '4BR → 7BR+', minBudget: 4000000, maxBudget: 12000000, minRent: 220000, maxRent: 600000 },
     ],
     notes: 'Includes sub-communities: Villanova, The Villa, Majan, Falcon City, Rukan, Al Habtoor Polo Resort.',
   },
@@ -293,30 +297,30 @@ export const LOCATIONS: LocationData[] = [
     name: 'Majan',
     value: 'Majan',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 420000, maxBudget: 1600000 },
+      { type: 'Apartments', unitTypes: 'Studio → 3BR', minBudget: 420000, maxBudget: 1600000, minRent: 32000, maxRent: 95000 },
     ],
   },
   {
     name: 'Falcon City of Wonders',
     value: 'Falcon City of Wonders',
     products: [
-      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2400000, maxBudget: 3800000 },
-      { type: 'Villas', unitTypes: '4BR → 7BR', minBudget: 4500000, maxBudget: 9000000 },
+      { type: 'Townhouses', unitTypes: '3BR → 4BR', minBudget: 2400000, maxBudget: 3800000, minRent: 150000, maxRent: 250000 },
+      { type: 'Villas', unitTypes: '4BR → 7BR', minBudget: 4500000, maxBudget: 9000000, minRent: 220000, maxRent: 450000 },
     ],
   },
   {
     name: 'Rukan',
     value: 'Rukan',
     products: [
-      { type: 'Apartments', unitTypes: 'Studio → 2BR', minBudget: 450000, maxBudget: 1200000 },
-      { type: 'Townhouses', unitTypes: '2BR → 3BR', minBudget: 1300000, maxBudget: 2400000 },
+      { type: 'Apartments', unitTypes: 'Studio → 2BR', minBudget: 450000, maxBudget: 1200000, minRent: 35000, maxRent: 80000 },
+      { type: 'Townhouses', unitTypes: '2BR → 3BR', minBudget: 1300000, maxBudget: 2400000, minRent: 90000, maxRent: 150000 },
     ],
   },
   {
     name: 'Al Habtoor Polo Resort & Club',
     value: 'Al Habtoor Polo Resort',
     products: [
-      { type: 'Villas', unitTypes: '3BR → 6BR', minBudget: 5000000, maxBudget: 18000000 },
+      { type: 'Villas', unitTypes: '3BR → 6BR', minBudget: 5000000, maxBudget: 18000000, minRent: 300000, maxRent: 800000 },
     ],
   },
 ];
@@ -400,6 +404,41 @@ export function getLocationsByBudget(budget: number): { label: string; value: st
       };
     })
     .filter(Boolean) as { label: string; value: string; matchingProducts: string[] }[];
+}
+
+/**
+ * Filter locations where at least one product's rent range fits the given annual budget.
+ * Shows matching product types and starting rent in suggestions.
+ */
+export function getLocationsByRentBudget(annualBudget: number): { label: string; value: string; matchingProducts: string[]; startingRent: number }[] {
+  if (annualBudget <= 0) {
+    return LOCATIONS
+      .filter(loc => loc.products.some(p => p.minRent != null))
+      .map(loc => {
+        const rentProducts = loc.products.filter(p => p.minRent != null);
+        const lowestRent = Math.min(...rentProducts.map(p => p.minRent!));
+        return {
+          label: loc.name,
+          value: loc.value,
+          matchingProducts: rentProducts.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
+          startingRent: lowestRent,
+        };
+      });
+  }
+
+  return LOCATIONS
+    .map(loc => {
+      const matching = loc.products.filter(p => p.minRent != null && annualBudget >= p.minRent!);
+      if (matching.length === 0) return null;
+      const lowestRent = Math.min(...matching.map(p => p.minRent!));
+      return {
+        label: loc.name,
+        value: loc.value,
+        matchingProducts: matching.map(p => PRODUCT_TYPE_MAP[p.type] || p.type),
+        startingRent: lowestRent,
+      };
+    })
+    .filter(Boolean) as { label: string; value: string; matchingProducts: string[]; startingRent: number }[];
 }
 
 /**
