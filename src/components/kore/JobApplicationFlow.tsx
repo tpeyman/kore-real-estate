@@ -375,14 +375,9 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                 className={inputClass}
               >
                 <option value="">Preferred Language</option>
-                <option value="English">English</option>
-                <option value="Arabic">Arabic</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Urdu">Urdu</option>
-                <option value="Russian">Russian</option>
-                <option value="Chinese">Chinese</option>
-                <option value="French">French</option>
-                <option value="Other">Other</option>
+                {LANGUAGE_OPTIONS.map(lang => (
+                  <option key={lang.value} value={lang.value}>{lang.label}</option>
+                ))}
               </select>
 
               <motion.button
