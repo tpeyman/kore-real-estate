@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Bot } from 'lucide-react';
 import LeadForm from '@/components/kore/LeadForm';
+import AIAgentLogicPanel from '@/components/kore/AIAgentLogicPanel';
 
 const Index = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [formPhase, setFormPhase] = useState<string>('type-select');
+  const [showAILogic, setShowAILogic] = useState(false);
 
   return (
     <>
@@ -61,6 +63,20 @@ const Index = () => {
             </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* AI Agent Logic Button */}
+      <button
+        onClick={() => setShowAILogic(true)}
+        className="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-sans text-sm font-medium shadow-lg hover:opacity-90 transition-opacity"
+      >
+        <Bot className="h-4 w-4" />
+        AI Agent Logic
+      </button>
+
+      {/* AI Agent Logic Panel */}
+      <AnimatePresence>
+        {showAILogic && <AIAgentLogicPanel onClose={() => setShowAILogic(false)} />}
       </AnimatePresence>
     </>
   );
