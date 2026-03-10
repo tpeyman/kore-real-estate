@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Bot } from 'lucide-react';
 import LeadForm from '@/components/kore/LeadForm';
+import AIAgentLogicPanel from '@/components/kore/AIAgentLogicPanel';
 
 const Index = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [formPhase, setFormPhase] = useState<string>('type-select');
+  const [showAILogic, setShowAILogic] = useState(false);
 
   return (
     <>
