@@ -517,7 +517,7 @@ const AIAgentLogicPanel = ({ onClose }: AIAgentLogicPanelProps) => {
             </Section>
 
           </div>
-        </ScrollArea>
+        </div>
       </motion.div>
     </motion.div>
   );
