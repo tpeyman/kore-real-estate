@@ -112,7 +112,7 @@ const AIAgentLogicPanel = ({ onClose }: AIAgentLogicPanelProps) => {
         </div>
 
         {/* Content */}
-        <ScrollArea className="flex-1 px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           <div className="space-y-3 pb-6">
 
             {/* Persona */}
