@@ -29,6 +29,7 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
   const [pendingValue, setPendingValue] = useState('');
   const [verifyMethod, setVerifyMethod] = useState<'email' | 'phone' | null>(null);
   const [contactVerified, setContactVerified] = useState(false);
+  const [sessionId, setSessionId] = useState('');
   const [jobStep, setJobStep] = useState<JobStep>('upload');
 
   useEffect(() => {
@@ -85,12 +86,36 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
 
   const [pendingContact, setPendingContact] = useState<ContactInfo | null>(null);
 
+  const sendOtp = useCallback(async (phone: string, email: string, method: 'email' | 'phone', type: string) => {
+    try {
+      const res = await fetch('https://koredxb.app.n8n.cloud/webhook/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone,
+          email,
+          method: method === 'phone' ? 'whatsapp' : 'email',
+          type,
+        }),
+      });
+      const data = await res.json();
+      if (data?.success) {
+        setSessionId(data.sessionId);
+      }
+    } catch (err) {
+      console.error('Failed to send OTP:', err);
+    }
+  }, []);
+
   const handleRequestOtp = useCallback((value: string, method: 'email' | 'phone' | null, contactInfo?: ContactInfo) => {
     setPendingValue(value);
     setVerifyMethod(method);
     if (contactInfo) setPendingContact(contactInfo);
+    if (method && contactInfo) {
+      sendOtp(contactInfo.phone, contactInfo.email, method, leadType || 'lead');
+    }
     setPhase('otp');
-  }, []);
+  }, [leadType, sendOtp]);
 
   const handleOtpVerified = useCallback(() => {
     setContactVerified(true);
@@ -238,8 +263,17 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
                 key="otp"
                 contactValue={pendingValue}
                 method={verifyMethod}
+                sessionId={sessionId}
+                phone={pendingContact?.phone || ''}
+                email={pendingContact?.email || ''}
+                leadType={leadType || 'lead'}
                 onVerified={handleOtpVerified}
-                onBack={() => setPhase('contact')} />
+                onBack={() => setPhase('contact')}
+                onResend={() => {
+                  if (pendingContact && verifyMethod) {
+                    sendOtp(pendingContact.phone, pendingContact.email, verifyMethod, leadType || 'lead');
+                  }
+                }} />
             }
 
             {phase === 'summary' && contact &&
@@ -251,7 +285,7 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
                 score={score}
                 luxuryTier={luxuryTier}
                 onSubmit={handleFinalSubmit}
-                onBack={() => setPhase('contact')} />
+                onBack={() => { setContactVerified(false); setPhase('contact'); }} />
             }
 
             {phase === 'thank-you' &&

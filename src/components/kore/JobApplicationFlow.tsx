@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import OtpVerification from './OtpVerification';
 import PhoneInputField from './PhoneInputField';
-import { supabase } from '@/integrations/supabase/client';
 import { LANGUAGE_OPTIONS } from '@/lib/flowConfig';
 
 interface JobData {
@@ -47,6 +46,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
   const [textValue, setTextValue] = useState('');
   const [verifyMethod, setVerifyMethod] = useState<'email' | 'phone' | null>(null);
   const [pendingValue, setPendingValue] = useState('');
+  const [sessionId, setSessionId] = useState('');
 
   const goTo = useCallback((s: JobStep) => {
     setStep(s);
@@ -115,20 +115,32 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
     goTo('verify-pick');
   };
 
+  const sendOtp = async (method: 'email' | 'phone') => {
+    try {
+      const res = await fetch('https://koredxb.app.n8n.cloud/webhook/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: data.phone,
+          email: data.email,
+          method: method === 'phone' ? 'whatsapp' : 'email',
+          type: 'job',
+        }),
+      });
+      const result = await res.json();
+      if (result?.success) {
+        setSessionId(result.sessionId);
+      }
+    } catch (err) {
+      console.error('Failed to send OTP:', err);
+    }
+  };
+
   const handleMethodSelect = async (method: 'email' | 'phone') => {
     const value = method === 'email' ? data.email : data.phone;
     setVerifyMethod(method);
     setPendingValue(value);
-
-    // Send OTP
-    try {
-      await supabase.functions.invoke('send-otp', {
-        body: { email: data.email },
-      });
-    } catch (err) {
-      console.error('Failed to send OTP:', err);
-    }
-
+    await sendOtp(method);
     goTo('otp');
   };
 
@@ -448,8 +460,13 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
             key="otp"
             contactValue={pendingValue}
             method={verifyMethod!}
+            sessionId={sessionId}
+            phone={data.phone}
+            email={data.email}
+            leadType="job"
             onVerified={handleOtpVerified}
             onBack={() => goTo('verify-pick')}
+            onResend={() => { if (verifyMethod) sendOtp(verifyMethod); }}
           />
         );
 
