@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const OTP_API_BASE = 'https://koredxb.app.n8n.cloud/webhook';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  wrong_code: 'Incorrect code. Please try again.',
+  wrong_code: 'Incorrect code. Please Try Again.',
   expired: 'Code expired. Please request a new one.',
   not_found: 'Session not found. Please request a new code.',
   already_used: 'Code already used. Please request a new one.',
