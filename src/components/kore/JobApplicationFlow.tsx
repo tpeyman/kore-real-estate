@@ -123,7 +123,8 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
         body: JSON.stringify({
           phone: data.phone,
           email: data.email,
-          method: method === 'phone' ? 'whatsapp' : 'email',
+          method: method === 'phone' ? 'sms' : 'email',
+          // method: method === 'phone' ? 'whatsapp' : 'email', // WhatsApp - uncomment when ready
           type: 'job',
         }),
       });
@@ -435,7 +436,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                   onClick={() => handleMethodSelect('phone')}
                   className="w-full py-3.5 rounded-xl border border-border bg-secondary text-secondary-foreground font-sans text-sm hover:border-primary/50 hover:bg-secondary/80 transition-all"
                 >
-                  Verify via Phone — {data.phone}
+                  Verify via SMS — {data.phone}
                 </button>
                 <button
                   onClick={() => handleMethodSelect('email')}

@@ -94,7 +94,8 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
         body: JSON.stringify({
           phone,
           email,
-          method: method === 'phone' ? 'whatsapp' : 'email',
+          method: method === 'phone' ? 'sms' : 'email',
+          // method: method === 'phone' ? 'whatsapp' : 'email', // WhatsApp - uncomment when ready
           type,
         }),
       });
