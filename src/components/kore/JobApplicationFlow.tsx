@@ -123,8 +123,8 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
         body: JSON.stringify({
           phone: data.phone,
           email: data.email,
-          method: method === 'phone' ? 'sms' : 'email',
-          // method: method === 'phone' ? 'whatsapp' : 'email', // WhatsApp - uncomment when ready
+          method: method === 'phone' ? 'whatsapp' : 'email',
+          // method: method === 'phone' ? 'sms' : 'email', // SMS via Twilio - uncomment when Twilio verified
           type: 'job',
         }),
       });
@@ -147,6 +147,37 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
 
   const handleOtpVerified = () => {
     goTo('summary');
+  };
+
+  const handleJobSubmit = async () => {
+    try {
+      await fetch('https://koredxb.app.n8n.cloud/webhook/lovable-lead-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadType: 'job',
+          answers: {
+            position: data.position,
+            education: data.education,
+            location: data.location,
+            experience: data.experience,
+            drivingLicence: data.drivingLicence,
+            portfolio: data.portfolio,
+          },
+          contact: {
+            name: data.fullName,
+            phone: data.phone,
+            email: data.email,
+            language: data.preferredLanguage,
+          },
+          score: 'N/A',
+          source: 'Lovable',
+        }),
+      });
+    } catch (err) {
+      console.error('Failed to submit job application:', err);
+    }
+    onSubmit();
   };
 
   const selectBtnClass = "group relative px-6 py-4 rounded-xl border border-border bg-card text-card-foreground font-sans text-base hover:border-primary hover:bg-secondary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 text-left";
@@ -436,7 +467,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
                   onClick={() => handleMethodSelect('phone')}
                   className="w-full py-3.5 rounded-xl border border-border bg-secondary text-secondary-foreground font-sans text-sm hover:border-primary/50 hover:bg-secondary/80 transition-all"
                 >
-                  Verify via SMS — {data.phone}
+                  Verify via WhatsApp — {data.phone}
                 </button>
                 <button
                   onClick={() => handleMethodSelect('email')}
@@ -526,7 +557,7 @@ const JobApplicationFlow = ({ onBack, onSubmit, onStepChange }: JobApplicationFl
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={onSubmit}
+              onClick={handleJobSubmit}
               className={continueBtnClass + ' mt-6'}
             >
               Submit Application
