@@ -129,7 +129,7 @@ const ContactForm = ({ onSubmit, onBack, onRequestOtp, emailVerified: externalVe
                 onClick={() => handleMethodSelect('phone')}
                 className="w-full py-3.5 rounded-xl border border-border bg-secondary text-secondary-foreground font-sans text-sm hover:border-primary/50 hover:bg-secondary/80 transition-all"
               >
-                Verify via SMS — {form.phone}
+                Verify via WhatsApp — {form.phone}
               </button>
               <button
                 onClick={() => handleMethodSelect('email')}

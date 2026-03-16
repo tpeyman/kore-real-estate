@@ -94,8 +94,8 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
         body: JSON.stringify({
           phone,
           email,
-          method: method === 'phone' ? 'sms' : 'email',
-          // method: method === 'phone' ? 'whatsapp' : 'email', // WhatsApp - uncomment when ready
+          method: method === 'phone' ? 'whatsapp' : 'email',
+          // method: method === 'phone' ? 'sms' : 'email', // SMS via Twilio - uncomment when Twilio verified
           type,
         }),
       });
@@ -142,8 +142,24 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
     setPhase('summary');
   }, [leadType, answers]);
 
-  const handleFinalSubmit = useCallback(() => {
-    console.log('Lead submitted:', { leadType, answers, contact, score, luxuryTier, tags });
+  const handleFinalSubmit = useCallback(async () => {
+    try {
+      await fetch('https://koredxb.app.n8n.cloud/webhook/lovable-lead-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadType,
+          answers,
+          contact,
+          score,
+          luxuryTier,
+          tags,
+          source: 'Lovable',
+        }),
+      });
+    } catch (err) {
+      console.error('Failed to submit lead:', err);
+    }
     setPhase('thank-you');
   }, [leadType, answers, contact, score, luxuryTier, tags]);
 
