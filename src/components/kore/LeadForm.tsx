@@ -122,10 +122,11 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
     setContactVerified(true);
     if (pendingContact) {
       setContact(pendingContact);
-      const result = calculateLeadScore(leadType!, answers);
-      setScore(result.score);
-      setLuxuryTier(result.luxuryTier);
-      setTags(result.tags);
+      // AI scoring now happens in n8n, not frontend
+      // const result = calculateLeadScore(leadType!, answers);
+      // setScore(result.score);
+      // setLuxuryTier(result.luxuryTier);
+      // setTags(result.tags);
       setPhase('summary');
     } else {
       setPhase('contact');
@@ -135,10 +136,11 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
   const handleContactSubmit = useCallback((info: ContactInfo) => {
     setPendingContact(info);
     setContact(info);
-    const result = calculateLeadScore(leadType!, answers);
-    setScore(result.score);
-    setLuxuryTier(result.luxuryTier);
-    setTags(result.tags);
+    // AI scoring now happens in n8n, not frontend
+    // const result = calculateLeadScore(leadType!, answers);
+    // setScore(result.score);
+    // setLuxuryTier(result.luxuryTier);
+    // setTags(result.tags);
     setPhase('summary');
   }, [leadType, answers]);
 
@@ -151,9 +153,7 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
           leadType,
           answers,
           contact,
-          score,
-          luxuryTier,
-          tags,
+          // score, luxuryTier, tags — now calculated by AI in n8n
           source: 'Lovable',
         }),
       });
@@ -161,7 +161,7 @@ const LeadForm = ({ onPhaseChange }: LeadFormProps) => {
       console.error('Failed to submit lead:', err);
     }
     setPhase('thank-you');
-  }, [leadType, answers, contact, score, luxuryTier, tags]);
+  }, [leadType, answers, contact]);
 
   const handleJobSubmit = useCallback(() => {
     console.log('Job application submitted');

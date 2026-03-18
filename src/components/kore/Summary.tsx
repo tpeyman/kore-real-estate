@@ -42,6 +42,7 @@ const Summary = ({ leadType, answers, contact, score, luxuryTier, onSubmit, onBa
           <span className="text-primary font-sans font-semibold text-sm uppercase tracking-wider">
             {getLeadTypeLabel(leadType)}
           </span>
+          {/* Score hidden from user — AI scoring happens in n8n, visible only to agents in CRM
           <div className="flex gap-2">
             <span className={`px-3 py-1 rounded-full text-xs font-sans font-semibold border ${scoreColors[score]}`}>
               {score}
@@ -52,6 +53,7 @@ const Summary = ({ leadType, answers, contact, score, luxuryTier, onSubmit, onBa
               </span>
             )}
           </div>
+          */}
         </div>
 
         <div className="h-px bg-border" />
