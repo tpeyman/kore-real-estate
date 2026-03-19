@@ -79,7 +79,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'DM Sans', system-ui, sans-serif;
-    background: hsl(240 4% 9%);
+    background: hsl(43 33% 94%);
     min-height: 100vh;
   }
 
