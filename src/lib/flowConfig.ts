@@ -181,7 +181,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
       { label: '1 Cheque', value: '1 Cheque' },
       { label: '2 Cheques', value: '2 Cheques' },
       { label: '4 Cheques', value: '4 Cheques' },
-      { label: 'Monthly', value: 'Monthly' },
+      { label: 'Other (please specify)', value: 'Monthly' },
     ]},
     { id: 'tenant_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },
     { id: 'tenant_eid', text: 'Do you have a valid Emirates ID?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }, { label: 'In Process', value: 'In Process' }] },
