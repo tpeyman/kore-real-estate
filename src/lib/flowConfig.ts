@@ -180,7 +180,7 @@ export const FLOWS: Record<LeadType, Question[]> = {
     { id: 'tenant_cheques', text: 'Preferred payment method?', type: 'select', options: [
       { label: '1 Cheque', value: '1 Cheque' },
       { label: '2 Cheques', value: '2 Cheques' },
-      { label: '4 Cheques', value: '4 Cheques' },
+      { label: '3 Cheques', value: '3 Cheques' },
       { label: 'Other (please specify)', value: 'Monthly' },
     ]},
     { id: 'tenant_in_dubai', text: 'Are you currently in Dubai?', type: 'select', options: [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }] },

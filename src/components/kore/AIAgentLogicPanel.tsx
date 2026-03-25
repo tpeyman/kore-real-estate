@@ -211,7 +211,7 @@ const AIAgentLogicPanel = ({ onClose }: AIAgentLogicPanelProps) => {
                 { field: 'Property Type', type: 'Select + Other', notes: 'Filtered by rent budget & area' },
                 { field: 'Bedrooms', type: 'Select', notes: 'Filtered by property type + budget + area' },
                 { field: 'Move-in Timeline', type: 'Select', notes: 'Standard timeline options' },
-                { field: 'Payment Method', type: 'Select', notes: '1 / 2 / 4 Cheques / Other' },
+                { field: 'Payment Method', type: 'Select', notes: '1 / 2 / 3 Cheques / Other' },
                 { field: 'Currently in Dubai', type: 'Select', notes: 'Yes / No' },
                 { field: 'Emirates ID', type: 'Select', notes: 'Yes / No / In Process' },
               ]} />
