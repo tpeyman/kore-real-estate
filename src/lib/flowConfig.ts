@@ -46,7 +46,7 @@ export const LEAD_TYPE_OPTIONS: { label: string; value: LeadType | 'job'; icon: 
   { label: 'Rent Property', value: 'tenant', icon: '🔑', description: 'Find your perfect rental' },
   { label: 'List My Property', value: 'landlord', icon: '📋', description: 'List your property for rent' },
   { label: 'Invest in Off-Plan', value: 'offplan', icon: '📈', description: 'Smart off-plan investments' },
-  { label: 'Luxury Investment', value: 'luxury', icon: '💎', description: 'Premium properties 3M+ AED' },
+  { label: 'Luxury Investment', value: 'luxury', icon: '💎', description: 'Premium properties ' },
   { label: 'Job at KORE', value: 'job', icon: '💼', description: 'Join our team of professionals' },
 ];
 
